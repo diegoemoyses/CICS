@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --link-color: #0969da;
+            --code-bg: #0c0c0c;
+            --heading-color: #1f2328;
+            --table-stripe: #f6f8fa;
+            --inline-code: #d73a49;
+            --success-color: #1a7f37;
+            --terminal-bg: #0c0c0c;
+            --terminal-text: #00ff00;
+            --img-bg: #f6f8fa;
+            --img-border: #d0d7de;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        h1, h2, h3, h4 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+        h1 { font-size: 2rem; border-bottom: 2px solid var(--border-color); }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.2rem; border-bottom: none; }
+        a { color: var(--link-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background-color: var(--table-stripe);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--inline-code);
+            border: 1px solid var(--border-color);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.7rem;
+            text-align: left;
+        }
+        th { background-color: var(--table-stripe); font-weight: 600; }
+        tr:nth-child(even) { background-color: var(--table-stripe); }
+        ul, ol { margin: 0.75rem 0; padding-left: 2rem; }
+        li { margin: 0.3rem 0; }
+        blockquote {
+            border-left: 3px solid var(--link-color);
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            background-color: var(--table-stripe);
+            border-radius: 0 6px 6px 0;
+        }
+        .toc {
+            background-color: var(--table-stripe);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin: 0.4rem 0; }
+        .toc a { font-weight: 500; }
+        .success { color: var(--success-color); }
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-text);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+        .terminal pre {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: var(--terminal-text);
+        }
+        .terminal .prompt { color: #00cc00; }
+        .terminal .cmd { color: #00ff00; font-weight: bold; }
+        .terminal .output { color: #00aa00; }
+        .terminal .hl { color: #ffff00; }
+        .diagram {
+            background-color: var(--table-stripe);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .img-placeholder {
+            background-color: var(--img-bg);
+            border: 2px dashed var(--img-border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #656d76;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            pre { font-size: 0.75rem; }
+            .terminal { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚀 Guia Prático: Configurando TOR e AOR com MRO e executando Cobol CICS</h1>
+<p><strong>Ambiente:</strong> CICS Transaction Server 4.1 · <strong>Autor:</strong> Diego Eduardo Moysés</p>
+
+<div class="toc">
+    <h3>📑 Sumário</h3>
+    <ol>
+        <li><a href="#introducao">O que é TOR, AOR e MRO?</a></li>
+        <li><a href="#arquitetura">Arquitetura do Ambiente</a></li>
+        <li><a href="#tor">Configurando o TOR (CICST01)</a></li>
+        <li><a href="#aor">Configurando os AORs (CICSA02 e CICSA03)</a></li>
+        <li><a href="#instalacao">Instalação e Verificação dos Recursos</a></li>
+        <li><a href="#execucao">Executando a Transação TEST</a></li>
+    </ol>
+</div>
+
+<hr>
+
+<h2 id="introducao">1. O que é TOR, AOR e MRO?</h2>
+
+<h3>TOR (Terminal Owning Region)</h3>
+<p>Região CICS que recebe as requisições dos terminais e as roteia para os AORs. <strong>Não executa</strong> programas de aplicação nem acessa banco de dados diretamente.</p>
+
+<h3>AOR (Application Owning Region)</h3>
+<p>Região CICS que executa os programas de aplicação, contém as transações e gerencia as conexões com DB2 e outros recursos.</p>
+
+<h3>O que é MRO?</h3>
+<p><strong>Multi-Region Operation</strong> é o mecanismo de comunicação entre regiões CICS rodando no mesmo z/OS. Utiliza o <strong>IRC (Inter-Region Communication)</strong> e o protocolo <strong>LU61</strong> para troca de dados entre as regiões.</p>
+
+<hr>
+
+<h2 id="arquitetura">2. Arquitetura do Ambiente</h2>
+
+<div class="diagram">
+Terminal (L702)
+    │
+    ▼
+┌──────────┐
+│ CICST01  │  TOR - Terminal Owning Region
+│SYSID=CST1│
+│          │  • Recebe requisições dos terminais
+└────┬─────┘  • Roteia para os AORs
+     │
+     │  IRC (Inter-Region Communication)
+     │
+     ├───────────┐
+     ▼           ▼
+┌──────────┐ ┌──────────┐
+│ CICSA02  │ │ CICSA03  │  AORs - Application Owning Regions
+│SYSID=CSA2│ │SYSID=CSA3│
+│          │ │          │  • Executam programas
+└──────────┘ └──────────┘  • Acessam DB2
+</div>
+
+<hr>
+
+<h2 id="tor">3. Configurando o TOR (CICST01)</h2>
+<p>No CICS TOR <strong>CICST01</strong>, vamos definir <strong>Connection</strong> e <strong>Session</strong> para os AORs <strong>CICSA02</strong> e <strong>CICSA03</strong>, além da transação <strong>TEST</strong>.</p>
+
+<h3>3.1 Conexão com CICSA02</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE CONNECTION(CSA2) GROUP(GTOR) ACCESSMETHOD(IRC) NETNAME(CICSA02)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS              
+ CEDA  View CONnection( CSA2 )      
+  CONnection     : CSA2             
+  Group          : GTOR             
+  DEScription    :                  
+ CONNECTION IDENTIFIERS             
+  Netname        : CICSA02          
+  INDsys         :                  
+ REMOTE ATTRIBUTES                  
+  REMOTESYSTem   :                  
+  REMOTEName     :                  
+  REMOTESYSNet   :                  
+ CONNECTION PROPERTIES              
+  ACcessmethod   : IRc              
+  PRotocol       :                  
+  COnntype       :                  
+  SInglesess     : No               
+  DAtastream     : User             
+  RECordformat   : U</span>
+</pre>
+</div>
+
+<h3>3.2 Sessão com CICSA02</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE SESSIONS(CSA2) GROUP(GTOR) CONNECTION(CSA2) PROTOCOL(LU61) SENDCOUNT(005) RECEIVECount(005)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS              
+ CEDA  View Sessions( CSA2     )    
+  Sessions       : CSA2             
+  Group          : GTOR             
+  DEScription    :                  
+ SESSION IDENTIFIERS                
+  COnnection     : CSA2             
+  SESSName       :                  
+  NETnameq       :                  
+  MOdename       :                  
+ SESSION PROPERTIES                 
+  Protocol       : Lu61             
+  MAximum        : 000 , 000        
+  RECEIVEPfx     : <                
+  RECEIVECount   : 005              
+  SENDPfx        : >                
+  SENDCount      : 005              
+  SENDSize       : 04096            
+  RECEIVESize    : 04096</span>
+</pre>
+</div>
+
+<h3>3.3 Conexão com CICSA03</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE CONNECTION(CSA3) GROUP(GTOR) ACCESSMETHOD(IRC) NETNAME(CICSA03)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS            
+ CEDA  View CONnection( CSA3 )    
+  CONnection     : CSA3           
+  Group          : GTOR           
+  DEScription    :                
+ CONNECTION IDENTIFIERS           
+  Netname        : CICSA03        
+  INDsys         :                
+ REMOTE ATTRIBUTES                
+  REMOTESYSTem   :                
+  REMOTEName     :                
+  REMOTESYSNet   :                
+ CONNECTION PROPERTIES            
+  ACcessmethod   : IRc            
+  PRotocol       :                
+  COnntype       :                
+  SInglesess     : No             
+  DAtastream     : User           
+  RECordformat   : U</span>
+</pre>
+</div>
+
+<h3>3.4 Sessão com CICSA03</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE SESSIONS(CSA3) GROUP(GTOR) CONNECTION(CSA3) PROTOCOL(LU61) SENDCOUNT(005) RECEIVECount(005)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS          
+ CEDA  View Sessions( CSA3     )
+  Sessions       : CSA3         
+  Group          : GTOR         
+  DEScription    :              
+ SESSION IDENTIFIERS            
+  COnnection     : CSA3         
+  SESSName       :              
+  NETnameq       :              
+  MOdename       :              
+ SESSION PROPERTIES             
+  Protocol       : Lu61         
+  MAximum        : 000 , 000    
+  RECEIVEPfx     : <            
+  RECEIVECount   : 005          
+  SENDPfx        : >            
+  SENDCount      : 005          
+  SENDSize       : 04096        
+  RECEIVESize    : 04096</span>
+</pre>
+</div>
+
+<h3>3.5 Transação TEST no TOR</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE TRANSACTION(TEST) GROUP(GTOR) PROGRAM(DFHMIRS) DYNAMIC(YES) REMOTESystem(CSA2) REMOTEName(TEST)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS                         
+ CEDA  View TRANSaction( TEST )                
+  TRANSaction    : TEST                        
+  Group          : GTOR                        
+  DEScription    :                             
+  PROGram        : DFHMIRS                       
+REMOTE ATTRIBUTES         
+ DYnamic        : Yes     
+ ROutable       : Yes     
+ REMOTESystem   : CSA2    
+ REMOTEName     : TEST</span>
+</pre>
+</div>
+
+<hr>
+
+<h2 id="aor">4. Configurando os AORs (CICSA02 e CICSA03)</h2>
+<p>Nos CICS AORs, definimos <strong>Connection</strong> e <strong>Session</strong> para o TOR <strong>CICST01</strong>, a transação <strong>TEST</strong> e o Programa <strong>HELLOCIC</strong>. Pode-se utilizar os mesmos recursos para ambas as regiões AOR desde que o arquivo CSD seja compartilhado. Caso contrário, será necessário criar os recursos para cada CICS AOR individualmente.</p>
+
+<h3>4.1 Conexão com o TOR</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE CONNECTION(CST1) GROUP(GAOR) ACCESSMETHOD(IRC) NETNAME(CICST01)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS               
+ CEDA  View CONnection( CST1 )       
+  CONnection     : CST1              
+  Group          : GAOR              
+  DEScription    :                   
+ CONNECTION IDENTIFIERS              
+  Netname        : CICST01           
+  INDsys         :                   
+ REMOTE ATTRIBUTES                   
+  REMOTESYSTem   :                   
+  REMOTEName     :                   
+  REMOTESYSNet   :                   
+ CONNECTION PROPERTIES               
+  ACcessmethod   : IRc</span>
+</pre>
+</div>
+
+<h3>4.2 Sessão com o TOR</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE SESSIONS(CST1) GROUP(GAOR) CONNECTION(CST1) PROTOCOL(LU61) SENDCOUNT(005) RECEIVECount(005)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS               
+ CEDA  View Sessions( CST1     )     
+  Sessions       : CST1              
+  Group          : GAOR              
+  DEScription    :                   
+ SESSION IDENTIFIERS                 
+  COnnection     : CST1              
+  SESSName       :                   
+  NETnameq       :                   
+  MOdename       :                   
+ SESSION PROPERTIES                  
+  Protocol       : Lu61              
+  MAximum        : 000 , 000         
+  RECEIVEPfx     : <                 
+  RECEIVECount   : 005               
+  SENDPfx        : >                 
+  SENDCount      : 005               
+  SENDSize       : 04096             
+  RECEIVESize    : 04096</span>
+</pre>
+</div>
+
+<h3>4.3 Transação TEST no AOR</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE TRANSACTION(TEST) GROUP(GAOR) PROGRAM(HELLOCIC)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS          
+ CEDA  View TRANSaction( TEST ) 
+  TRANSaction    : TEST         
+  Group          : GAOR         
+  DEScription    :              
+  PROGram        : HELLOCIC</span>
+</pre>
+</div>
+
+<h3>4.4 Programa HELLOCIC no AOR</h3>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">DEFINE PROGRAM(HELLOCIC) GROUP(GAOR) LANGUAGE(COBOL)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS               
+ CEDA  View PROGram( HELLOCIC )      
+  PROGram        : HELLOCIC          
+  Group          : GAOR              
+  DEScription    :                   
+  Language       : CObol</span>
+</pre>
+</div>
+
+<hr>
+
+<h2 id="instalacao">5. Instalação e Verificação dos Recursos</h2>
+<p>Realize o <strong>INSTALL</strong> dos recursos em todos os CICS, manualmente ou com a reciclagem das regiões caso esteja utilizando autoinstall por lista definida na tabela SIT de cada CICS.</p>
+<p>Após a instalação, abra o <strong>IRC</strong> e adquira as conexões:</p>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEMT</span> <span class="cmd">SET IRC OPEN</span>
+<span class="prompt">CEMT</span> <span class="cmd">SET CONNECTION(CSA2) ACQUIRED</span>
+<span class="prompt">CEMT</span> <span class="cmd">SET CONNECTION(CSA3) ACQUIRED</span>
+</pre>
+</div>
+
+<h3>5.1 Verificação no TOR (CICST01)</h3>
+
+<div class="terminal">
+<pre>
+<span class="output">I CONN                                                        
+STATUS:  RESULTS - OVERTYPE TO MODIFY                         
+ Con(CSA2) Net(CICSA02 )     Ins Acq Irc              Nrs     
+ Con(CSA3) Net(CICSA03 )     Ins Acq Irc              Nrs      
+---
+I TRANS(TEST)                                                       
+STATUS:  RESULTS - OVERTYPE TO MODIFY                               
+ Tra(TEST) Pri( 001 ) Pro(DFHMIRS ) Tcl( DFHTCL00 ) Ena Dyn         
+    Rou     Prf(DFHCICST) Uda Bel Iso Trp(DFHCICSS) Bac Wai</span>
+</pre>
+</div>
+
+<h3>5.2 Verificação nos AORs (CICSA02 e CICSA03)</h3>
+
+<div class="terminal">
+<pre>
+<span class="output">I CONN                                                       
+STATUS:  RESULTS - OVERTYPE TO MODIFY                        
+ Con(CST1) Net(CICST01 )     Ins Acq Irc              Nrs     
+---
+I TRANS(TEST)                                                  
+STATUS:  RESULTS - OVERTYPE TO MODIFY                          
+ Tra(TEST) Pri( 001 ) Pro(HELLOCIC) Tcl( DFHTCL00 ) Ena Sta    
+            Prf(DFHCICST) Uda Bel Iso               Bac Wai    
+---
+I PROG(HELLOCIC)                                                   
+STATUS:  RESULTS - OVERTYPE TO MODIFY                              
+ Prog(HELLOCIC) Leng(0000006304) Cob Pro Ena Pri     Ced           
+    Res(000) Use(0000000005) Bel Uex Ful Qua Cic               Len</span>
+</pre>
+</div>
+
+<blockquote>
+    <strong>✅ Sinais de Sucesso:</strong> Conexões com status <code>Ins Acq Irc</code>, transação <code>TEST</code> <code>Enabled</code> e programa <code>HELLOCIC</code> <code>Enabled</code> com contador de uso.
+</blockquote>
+
+<hr>
+
+<h2 id="execucao">6. Executando a Transação TEST</h2>
+<p>Com tudo configurado e os CICS comunicando, execute a transação <strong>TEST</strong> no terminal do TOR <strong>CICST01</strong>.</p>
+
+<h3>6.1 O programa Cobol HELLOCIC será chamado pela transação TEST</h3>
+<p>O fonte completo pode ser acessado aqui <strong>HELLOCIC</strong>.</p>
+
+<div class="terminal">
+<pre>
+<span class="output">
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLOCIC.
+      *
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      *
+       01 WS-APPLID-AOR    PIC X(08) VALUE SPACES.
+       01 WS-NETNAME-TOR   PIC X(08) VALUE SPACES.
+       01 WS-MSG-OUT       PIC X(80) VALUE SPACES.
+       01 WS-MSG-LEN       PIC S9(04) COMP VALUE 80.
+       01 WS-LINHA1        PIC X(40) VALUE SPACES.
+       01 WS-LINHA2        PIC X(40) VALUE SPACES.
+       01 WS-LINHA3        PIC X(40) VALUE SPACES.
+       01 WS-TAM-L1        PIC S9(04) COMP VALUE 0.
+       01 WS-TAM-L2        PIC S9(04) COMP VALUE 0.
+       01 WS-TAM-L3        PIC S9(04) COMP VALUE 0.
+       01 WS-CRLF          PIC X(01) VALUE X'0D'.
+      *
+       PROCEDURE DIVISION.
+       MAIN-PARA.
+           EXEC CICS ASSIGN
+                APPLID(WS-APPLID-AOR)
+           END-EXEC.
+      *
+           EXEC CICS ASSIGN
+                NETNAME(WS-NETNAME-TOR)
+           END-EXEC.
+
+</pre>
+</div>
+
+<h3>6.2 Primeira Execução: Roteando para CICSA02</h3>
+<p>A transação está configurada com <strong>REMOTESystem(CSA2)</strong>, que é o SYSID do <strong>CICSA02</strong>.</p>
+
+<div class="img-placeholder">
+    <p>📸 <strong>&lt;imagem&gt;</strong></p>
+    <p>Resultado da execução da transação TEST no CICSA02</p>
+</div>
+
+<h3>6.2 Alterando para CICSA03</h3>
+<p>Para rotear para o AOR <strong>CICSA03</strong>, altere o <strong>REMOTESystem</strong> para <strong>CSA3</strong> e reinstale o recurso.</p>
+
+<div class="terminal">
+<pre>
+<span class="prompt">CEDA</span> <span class="cmd">ALTER TRANSACTION(TEST) GROUP(GTOR) REMOTESystem(CSA3)</span>
+<span class="prompt">CEDA</span> <span class="cmd">INSTALL GROUP(GTOR)</span>
+</pre>
+</div>
+
+<div class="terminal">
+<pre>
+<span class="output">OBJECT CHARACTERISTICS                         
+ CEDA  View TRANSaction( TEST )                
+  TRANSaction    : TEST                        
+  Group          : GTOR                        
+  DEScription    :                             
+  PROGram        : DFHMIRS                       
+REMOTE ATTRIBUTES         
+ DYnamic        : Yes     
+ ROutable       : Yes     
+ REMOTESystem   : CSA3    
+ REMOTEName     : TEST</span>
+</pre>
+</div>
+
+<h3>6.3 Segunda Execução: Roteando para CICSA03</h3>
+<p>Execute a transação <strong>TEST</strong> novamente. Agora ela será processada no <strong>CICSA03</strong>.</p>
+
+<div class="img-placeholder">
+    <p>📸 <strong>&lt;imagem&gt;</strong></p>
+    <p>Resultado da execução da transação TEST no CICSA03</p>
+</div>
+
+<hr>
+
+<blockquote>
+    <strong>🎯 Conclusão:</strong> A comunicação TOR/AOR via MRO está configurada e funcional. O roteamento de transações entre os AORs pode ser controlado através do parâmetro <strong>REMOTESystem</strong> na definição da transação no TOR.
+</blockquote>
+
+<p style="text-align: center; margin-top: 2rem;">
+    <a href="#">🔝 Voltar ao topo</a>
+</p>
+
+</body>
+</html>
