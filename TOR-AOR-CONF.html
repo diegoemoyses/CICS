@@ -120,19 +120,6 @@
         .terminal .cmd { color: #00ff00; font-weight: bold; }
         .terminal .output { color: #00aa00; }
         .terminal .hl { color: #ffff00; }
-        .diagram {
-            background-color: var(--table-stripe);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 1rem;
-            margin: 1rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.7rem;
-            line-height: 1.2;
-            overflow-x: auto;
-            white-space: pre;
-            -webkit-overflow-scrolling: touch;
-        }
         .img-placeholder {
             background-color: var(--img-bg);
             border: 2px dashed var(--img-border);
@@ -143,16 +130,113 @@
             color: #656d76;
             font-style: italic;
         }
+        .img-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* ===========================================================
+           DIAGRAMA DE ARQUITETURA RESPONSIVO
+           =========================================================== */
+        .arch-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .arch-terminal {
+            display: inline-block;
+            background-color: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        .arch-arrow-down {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 0.2rem 0;
+        }
+        .arch-label {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+            margin: 0.3rem 0;
+        }
+        .arch-box {
+            background-color: var(--table-stripe);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: left;
+            flex: 1;
+            min-width: 220px;
+            max-width: 300px;
+        }
+        .arch-box-title {
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 0.2rem;
+        }
+        .arch-box-subtitle {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 0.4rem;
+        }
+        .arch-box ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            font-size: 0.8rem;
+        }
+        .arch-box li {
+            margin: 0.15rem 0;
+        }
+        .arch-tor {
+            border-color: #0969da;
+            background-color: #e8f0fe;
+            margin: 0.3rem auto;
+            max-width: 300px;
+        }
+        .arch-aor {
+            border-color: #1a7f37;
+            background-color: #e6f4ea;
+        }
+        .arch-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.3rem;
+        }
+
         @media (max-width: 600px) {
             body { padding: 1rem; }
             pre { font-size: 0.75rem; }
             .terminal { font-size: 0.75rem; }
+            .arch-box {
+                min-width: 100%;
+                max-width: 100%;
+            }
+            .arch-tor {
+                max-width: 100%;
+            }
+            .arch-row {
+                gap: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<h1>🚀 Guia Prático: Configurando CICS TOR e AOR com MRO e executando Cobol CICS</h1>
+<h1>🚀 Guia Prático: Configurando CICS TOR e AOR com MRO</h1>
 <p><strong>Ambiente:</strong> CICS Transaction Server 4.1 · <strong>Autor:</strong> Diego Eduardo Moysés</p>
 
 <div class="toc">
@@ -184,25 +268,38 @@
 
 <h2 id="arquitetura">2. Arquitetura do Ambiente</h2>
 
-<div class="diagram">
-Terminal (L702)
-    │
-    ▼
-┌──────────┐
-│ CICST01  │  TOR - Terminal Owning Region
-│SYSID=CST1│
-│          │  • Recebe requisições dos terminais
-└────┬─────┘  • Roteia para os AORs
-     │
-     │  IRC (Inter-Region Communication)
-     │
-     ├───────────┐
-     ▼           ▼
-┌──────────┐ ┌──────────┐
-│ CICSA02  │ │ CICSA03  │  AORs - Application Owning Regions
-│SYSID=CSA2│ │SYSID=CSA3│
-│          │ │          │  • Executam programas
-└──────────┘ └──────────┘  • Acessam DB2
+<div class="arch-container">
+    <div class="arch-terminal">Terminal (L702)</div>
+    <div class="arch-arrow-down">⬇</div>
+    <div class="arch-box arch-tor">
+        <div class="arch-box-title">CICST01 · TOR</div>
+        <div class="arch-box-subtitle">SYSID=CST1</div>
+        <ul>
+            <li>Recebe requisições</li>
+            <li>Roteia para os AORs</li>
+        </ul>
+    </div>
+    <div class="arch-arrow-down">⬇</div>
+    <div class="arch-label">IRC (Inter-Region Communication)</div>
+    <div class="arch-arrow-down">⬇</div>
+    <div class="arch-row">
+        <div class="arch-box arch-aor">
+            <div class="arch-box-title">CICSA02 · AOR</div>
+            <div class="arch-box-subtitle">SYSID=CSA2</div>
+            <ul>
+                <li>Executa programas</li>
+                <li>Acessa DB2</li>
+            </ul>
+        </div>
+        <div class="arch-box arch-aor">
+            <div class="arch-box-title">CICSA03 · AOR</div>
+            <div class="arch-box-subtitle">SYSID=CSA3</div>
+            <ul>
+                <li>Executa programas</li>
+                <li>Acessa DB2</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <hr>
@@ -528,7 +625,6 @@ STATUS:  RESULTS - OVERTYPE TO MODIFY
 
 <div class="terminal">
 <pre>
-<a href="https://github.com/diegoemoyses/COBOL/blob/main/HELLOCIC">    
 <span class="output">
        IDENTIFICATION DIVISION.
        PROGRAM-ID. HELLOCIC.
@@ -558,17 +654,17 @@ STATUS:  RESULTS - OVERTYPE TO MODIFY
                 NETNAME(WS-NETNAME-TOR)
            END-EXEC.
 </span>
-</a>
 </pre>
 </div>
 
 <h3>6.2 Primeira Execução: Roteando para CICSA02</h3>
 <p>Executando a transação <strong>TEST</strong> configurada com <strong>REMOTESystem(CSA2)</strong>, que é o SYSID do<strong>CICSA02</strong>.</p>
-<br><br>
-    <img src='HELLOCIC_A02.jpg'>
 
+<div class="img-container">
+    <img src='HELLOCIC_A02.jpg' alt='Execução no CICSA02'>
+</div>
 
-<h3>6.2 Alterando para CICSA03</h3>
+<h3>6.3 Alterando para CICSA03</h3>
 <p>Para rotear para o AOR <strong>CICSA03</strong>, altere o <strong>REMOTESystem</strong> para <strong>CSA3</strong> e reinstale o recurso.</p>
 
 <div class="terminal">
@@ -594,10 +690,12 @@ REMOTE ATTRIBUTES
 </pre>
 </div>
 
-<h3>6.3 Segunda Execução: Roteando para CICSA03</h3>
+<h3>6.4 Segunda Execução: Roteando para CICSA03</h3>
 <p>Executando a transação <strong>TEST</strong> novamente. Agora ela será processada no <strong>CICSA03</strong>.</p>
-<br><br>
-<img src='HELLOCIC_A03.png'>
+
+<div class="img-container">
+    <img src='HELLOCIC_A03.png' alt='Execução no CICSA03'>
+</div>
 
 <hr>
 
