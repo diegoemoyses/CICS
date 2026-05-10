@@ -222,14 +222,31 @@
             pre { font-size: 0.75rem; }
             .terminal { font-size: 0.75rem; }
             .arch-box {
-                min-width: 100%;
-                max-width: 100%;
+                min-width: 0;
+                max-width: none;
+                flex: 1 1 45%;
+                font-size: 0.7rem;
+                padding: 0.5rem;
             }
             .arch-tor {
-                max-width: 100%;
+                min-width: 0;
+                max-width: none;
+                flex: none;
+                width: 90%;
             }
             .arch-row {
-                gap: 0.8rem;
+                gap: 0.4rem;
+                flex-wrap: nowrap;
+            }
+            .arch-box-title {
+                font-size: 0.75rem;
+            }
+            .arch-box-subtitle {
+                font-size: 0.65rem;
+            }
+            .arch-box ul {
+                font-size: 0.65rem;
+                padding-left: 1rem;
             }
         }
     </style>
