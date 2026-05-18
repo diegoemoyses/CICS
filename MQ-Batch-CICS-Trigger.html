@@ -324,7 +324,7 @@ Usage . . . . . . . . . . . : N  N=Normal, X=XmitQ
 
 <h3>2.1 Programa COBOL: MQPUT01B</h3>
 <p>O programa conecta ao QMGR <strong>CSQ7</strong>, abre a fila informada via <code>PARM</code> e envia a mensagem lida do cartão <strong>SYSIN</strong>.</p>
-<p> O fonte completo pode ser acessado aqui MQPUT01B</p>
+<p> O fonte completo pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQPUT01B.cob">aqui MQPUT01B</a></p>
 
 <div class="terminal">
 <span class="highlight">IDENTIFICATION DIVISION.</span>
@@ -370,9 +370,8 @@ Usage . . . . . . . . . . . : N  N=Normal, X=XmitQ
 
 <h3>2.3 Resultado da Execução</h3>
 
-<div class="img-placeholder">
 <img src="job put batch 01.png">
-</div>
+
 
 <!-- ============================================================ -->
 <h2 id="verificacao-fila">3. Verificando a Mensagem na Fila</h2>
@@ -385,9 +384,7 @@ Usage . . . . . . . . . . . : N  N=Normal, X=XmitQ
 <span class="highlight">CURDEPTH(1)</span>
 </div>
 
-<div class="img-placeholder">
-[IMAGEM 02 - Painel MQ mostrando a fila com CURDEPTH=1]
-</div>
+<img src="painel mq 1.png">
 
 <!-- ============================================================ -->
 <h2 id="get-batch">4. GET via Job Batch</h2>
@@ -409,7 +406,7 @@ Usage . . . . . . . . . . . : N  N=Normal, X=XmitQ
 </div>
 <br>
 <p>
-Programa <strong>MQGET01B</strong> para consumir a mensagem via batch. O fonte completo pode ser acessao aqui.</p>
+Programa <strong>MQGET01B</strong> para consumir a mensagem via batch. O fonte completo pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQGET01B.cob">aqui</a>.</p>
 <div class="terminal">
 
        IDENTIFICATION DIVISION.                                     
@@ -440,9 +437,8 @@ Programa <strong>MQGET01B</strong> para consumir a mensagem via batch. O fonte c
 
 <h3>4.2 Resultado</h3>
 
-<div class="img-placeholder">
-[IMAGEM 03 - Sysout do job MQGET01B mostrando a mensagem lida]
-</div>
+
+<img src="sysout get 1.png">    
 
 <div class="terminal">
 <span class="cmd">/F CSQ7,DISPLAY QUEUE(LAB.LOCAL.APP.REQ.CICS) CURDEPTH</span>
@@ -499,7 +495,7 @@ CEDA  View PROGram( MQGET02C )
 
 <h3>5.4 Programa MQGET02C</h3>
 
-O fonte completo do programa  <strong>MQGET02C</strong> pode ser acesso aqui
+O fonte completo do programa  <strong>MQGET02C</strong> pode ser acessado <a href="MQGET02C.cob">aqui</a>.
 <div class="terminal">
         IDENTIFICATION DIVISION.                             
         PROGRAM-ID. MQGET02C.                                
@@ -529,15 +525,13 @@ O fonte completo do programa  <strong>MQGET02C</strong> pode ser acesso aqui
 
 <h3>5.5 Executando a Transação</h3>
 
-<div class="img-placeholder">
-[IMAGEM 04 - Terminal CICS após executar a transação TEST]
-</div>
+<img src="trans TEST.png">
+
 
 <h3>5.6 Visualizando a TS via CEBR</h3>
 
-<div class="img-placeholder">
-[IMAGEM 05 - Tela do CEBR mostrando o conteúdo da TS TEST]
-</div>
+<img src="TS TEST 01.png">
+
 
 <!-- ============================================================ -->
 <h2 id="trigger">6. Trigger MQ → CICS</h2>
@@ -575,9 +569,8 @@ O fonte completo do programa  <strong>MQGET02C</strong> pode ser acesso aqui
 
 <h3>6.4 Disparando o Trigger</h3>
 
-<div class="img-placeholder">
-[IMAGEM 06 - Sysout do job MQPUT01B - terceira execução]
-</div>
+<img src="job put batch 03.png">
+
 
 <div class="terminal">
 <span class="cmd">CEMT INQUIRE MQCONN</span>
