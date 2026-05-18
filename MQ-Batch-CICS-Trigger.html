@@ -495,7 +495,7 @@ CEDA  View PROGram( MQGET02C )
 
 <h3>5.4 Programa MQGET02C</h3>
 
-O fonte completo do programa  <strong>MQGET02C</strong> pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQTRIGON.cob">aqui</a>.
+O fonte completo do programa  <strong>MQGET02C</strong> pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQGET02C.cob">aqui</a>.
 <div class="terminal">
         IDENTIFICATION DIVISION.                             
         PROGRAM-ID. MQGET02C.                                
@@ -536,6 +536,47 @@ O fonte completo do programa  <strong>MQGET02C</strong> pode ser acessado <a hre
 <!-- ============================================================ -->
 <h2 id="trigger">6. Trigger MQ → CICS</h2>
 <p>Configurando um trigger no MQ para executar transação CICS.</p>
+<br>
+O fonte completo do programa  <strong>MQTRIGON</strong> pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQTRIGON.cobb">aqui</a>.
+<div class="terminal">
+     IDENTIFICATION DIVISION.
+       PROGRAM-ID. MQTRIGON.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01  MQ-OD-AREA.
+           COPY CMQODV.
+       01  MQ-MD-AREA.
+           COPY CMQMDV.
+       01  MQ-GMO-AREA.
+           COPY CMQGMOV.
+       01  MQ-CONST-AREA.
+           COPY CMQV.
+
+       01 WS-QUEUE-NAME-TEXT   PIC X(48) VALUE SPACES.
+       01 WS-MSG-LEN           PIC S9(9) COMP VALUE 100.
+       01 WS-MSG-DATA-LEN      PIC S9(9) COMP VALUE 0.
+       01 WS-MSG-TEXT          PIC X(100) VALUE SPACES.
+
+       01 WS-HCONN             PIC S9(9) COMP VALUE 0.
+       01 WS-HOBJ              PIC S9(9) COMP VALUE 0.
+       01 WS-COMP-CODE         PIC S9(9) COMP VALUE 0.
+       01 WS-REASON-CODE       PIC S9(9) COMP VALUE 0.
+       01 WS-MSG-SAIDA         PIC X(120) VALUE SPACES.
+
+       01  WS-COMP-CODE-DISP   PIC Z(8)9.
+       01  WS-REASON-CODE-DISP PIC Z(8)9.
+       01  WS-RESP-DISP        PIC Z(8)9.
+
+       01  WS-TS-QUEUE         PIC X(8) VALUE 'TEST    '.
+       01  WS-TS-ITEM          PIC S9(4) COMP VALUE 1.
+       01  WS-TS-RECORD        PIC X(120) VALUE SPACES.
+       01  WS-TS-RESP          PIC S9(8) COMP VALUE 0.
+       01  WS-TERM-MSG         PIC X(72) VALUE SPACES.
+       01  WS-OPER-MSG         PIC X(80) VALUE SPACES.
+</div>
+    
 <h3>6.1 PROCESS no MQ</h3>
 
 <div class="terminal">
