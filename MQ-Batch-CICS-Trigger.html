@@ -301,11 +301,11 @@
 <p>Primeiro, vamos criar a fila <code>LAB.LOCAL.APP.REQ.CICS</code>.</p>
 
 <div class="terminal">
-<span class="cmd">DEFINE QLOCAL(LAB.LOCAL.APP.REQ.CICS)</span>
-<span class="cmd">    PUT(ENABLED)</span>
-<span class="cmd">    GET(ENABLED)</span>
-<span class="cmd">    USAGE(NORMAL)</span>
-<span class="cmd">    DESCR('FILA DE TESTE MQ CICS')</span>
+<span class="cmd">DEFINE QLOCAL(LAB.LOCAL.APP.REQ.CICS) -</span>
+<span class="cmd">    PUT(ENABLED) -</span>
+<span class="cmd">    GET(ENABLED) -</span>
+<span class="cmd">    USAGE(NORMAL) -</span>
+<span class="cmd">    DESCR('FILA DE TESTE MQ CICS') -</span>
 <span class="cmd">    REPLACE</span>
 </div>
 
@@ -459,7 +459,7 @@ CURDEPTH(0)</span>
 <span class="cmd">CEDA DEF TRANSaction(TEST) GROUP(GAOR) PROGram(MQGET02C)</span>
 </div>
 <div class="terminal">
-CEDA  ALter TRANSaction( TEST )   
+CEDA  View TRANSaction( TEST )   
  TRANSaction    : TEST            
  Group          : GAOR            
  DEScription  ==>                 
@@ -540,7 +540,7 @@ O fonte completo do programa  <strong>MQGET02C</strong> pode ser acessado <a hre
 <h2 id="trigger">6. Trigger MQ → CICS</h2>
 <p>Configurando um trigger no MQ para executar transação CICS.</p>
 <br>
-O fonte completo do programa  <strong>MQTRIGON</strong> pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQTRIGON.cobb">aqui</a>.
+O fonte completo do programa  <strong>MQTRIGON</strong> pode ser acessado <a href="https://github.com/diegoemoyses/COBOL/blob/main/MQTRIGON.cob">aqui</a>.
 <div class="terminal">
      IDENTIFICATION DIVISION.
        PROGRAM-ID. MQTRIGON.
@@ -583,21 +583,21 @@ O fonte completo do programa  <strong>MQTRIGON</strong> pode ser acessado <a hre
 <h3>6.1 PROCESS no MQ</h3>
 
 <div class="terminal">
-<span class="cmd">DEFINE PROCESS(LAB.PROCESS.CICS.TRIG)</span>
-<span class="cmd">    APPLTYPE(CICS)</span>
-<span class="cmd">    APPLICID('TRIG')</span>
-<span class="cmd">    DESCR('ACIONA TRANSACAO TRIG NO CICS')</span>
+<span class="cmd">DEFINE PROCESS(LAB.PROCESS.CICS.TRIG) -</span>
+<span class="cmd">    APPLTYPE(CICS) -</span>
+<span class="cmd">    APPLICID('TRIG') -</span>
+<span class="cmd">    DESCR('ACIONA TRANSACAO TRIG NO CICS') -</span>
 <span class="cmd">    REPLACE</span>
 </div>
 
 <h3>6.2 Trigger na Fila</h3>
 
 <div class="terminal">
-<span class="cmd">ALTER QLOCAL(LAB.LOCAL.APP.REQ.CICS)</span>
-<span class="cmd">    TRIGGER(ON)</span>
-<span class="cmd">    TRIGTYPE(FIRST)</span>
-<span class="cmd">    TRIGDPTH(1)</span>
-<span class="cmd">    INITQ(CSQ7.TRIGGER.CICSA02)</span>
+<span class="cmd">ALTER QLOCAL(LAB.LOCAL.APP.REQ.CICS) -</span>
+<span class="cmd">    TRIGGER(ON) -</span>
+<span class="cmd">    TRIGTYPE(FIRST) -</span>
+<span class="cmd">    TRIGDPTH(1) -</span>
+<span class="cmd">    INITQ(CSQ7.TRIGGER.CICSA02) -</span>
 <span class="cmd">    PROCESS(LAB.PROCESS.CICS.TRIG)</span>
 </div>
 
