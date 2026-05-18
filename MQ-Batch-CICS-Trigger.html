@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 IBM MQ for z/OS - Mensageria com Batch, CICS e Trigger</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --card: #f6f8fa;
+            --border: #d0d7de;
+            --text: #24292f;
+            --title: #0969da;
+            --accent: #1a7f37;
+            --highlight: #9a6700;
+            --code-bg: #f6f8fa;
+            --terminal-bg: #0a0a0a;
+            --terminal-text: #00ff41;
+            --box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --link: #0969da;
+            --link-hover: #0550ae;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 20px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--title);
+            font-size: 2em;
+            margin: 30px 0 5px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.6em;
+            color: #57606a;
+            margin-bottom: 10px;
+        }
+
+        .author {
+            text-align: center;
+            color: #57606a;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        h2 {
+            color: var(--accent);
+            margin: 35px 0 15px;
+            font-size: 1.5em;
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        h3 {
+            color: var(--highlight);
+            margin: 25px 0 10px;
+            font-size: 1.2em;
+        }
+
+        a { color: var(--link); text-decoration: none; }
+        a:hover { color: var(--link-hover); text-decoration: underline; }
+
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .toc h3 { margin-top: 0; color: var(--title); }
+
+        .toc ol { padding-left: 20px; }
+        .toc li { margin: 6px 0; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            box-shadow: var(--box-shadow);
+        }
+
+        .terminal {
+            background: var(--terminal-bg);
+            color: var(--terminal-text);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', 'IBM Plex Mono', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+            box-shadow: 0 0 15px rgba(0,255,65,0.05);
+        }
+
+        .terminal .cmd { color: #00ff41; }
+        .terminal .comment { color: #666; }
+        .terminal .highlight { color: #ffcc00; }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', 'IBM Plex Mono', monospace;
+            font-size: 0.82em;
+            line-height: 1.3;
+            box-shadow: var(--box-shadow);
+        }
+
+        .img-placeholder {
+            background: #f6f8fa;
+            border: 2px dashed #d0d7de;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #656d76;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f6f8fa;
+            color: var(--accent);
+        }
+
+        /* ===== FLUXO CSS ===== */
+        .flow-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .flow-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--title);
+            margin-bottom: 20px;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .flow-box {
+            background: #ffffff;
+            border: 2px solid #0969da;
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-align: center;
+            font-weight: 600;
+            color: #0969da;
+            min-width: 120px;
+            box-shadow: 0 2px 8px rgba(9,105,218,0.1);
+        }
+
+        .flow-box.green {
+            border-color: #1a7f37;
+            color: #1a7f37;
+            box-shadow: 0 2px 8px rgba(26,127,55,0.1);
+        }
+
+        .flow-box.orange {
+            border-color: #9a6700;
+            color: #9a6700;
+            box-shadow: 0 2px 8px rgba(154,103,0,0.1);
+        }
+
+        .flow-arrow {
+            font-size: 1.5em;
+            color: #57606a;
+            font-weight: bold;
+        }
+
+        .flow-arrow-down {
+            font-size: 1.5em;
+            color: #57606a;
+            text-align: center;
+        }
+
+        .flow-label {
+            font-size: 0.8em;
+            color: #57606a;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .check { color: #1a7f37; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.5em; }
+            .flow-row { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚀 IBM MQ for z/OS</h1>
+<p class="subtitle"><strong>Mensageria com Job Batch, Transação CICS e Trigger</strong></p>
+<br>
+<p><strong>Autor:</strong> <a href="https://github.com/diegoemoyses"> Diego Eduardo Moysés <img src="https://img.shields.io/badge/-GitHub-181717">  </a></p>
+<!-- ============================================================ -->
+<!-- FLUXO CSS NO INÍCIO -->
+<!-- ============================================================ -->
+<div class="flow-container">
+    <div class="flow-title">📊 Arquitetura do Laboratório</div>
+
+    <div class="flow-row">
+        <div class="flow-box orange">JCL Batch<br>MQPUT01B</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Fila MQ<br>LAB.LOCAL.APP.REQ.CICS</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box green">JCL Batch<br>MQGET01B</div>
+    </div>
+<br>
+
+    <div class="flow-row">
+        <div class="flow-box orange">JCL Batch<br>MQPUT01B</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Fila MQ<br>LAB.LOCAL.APP.REQ.CICS</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box green">Trans CICS<br>MQGET02C</div>
+    </div>
+
+<br>
+    <div class="flow-row">
+        <div class="flow-box orange">JCL Batch<br>MQPUT01B</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Fila MQ<br>LAB.LOCAL.APP.REQ.CICS</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">INITQ<br>Trigger</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box green">CKTI<br>MQTRIGON</div>
+    </div>
+
+    <p class="flow-label" style="margin-top:15px;">Três formas de consumir mensagens: Batch, CICS Manual e Trigger Automático</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- ÍNDICE -->
+<!-- ============================================================ -->
+<div class="toc">
+    <h3>📋 Índice</h3>
+    <ol>
+        <li><a href="#definicao-fila">Definição da Fila no MQ</a></li>
+        <li><a href="#put-batch">PUT via Job Batch (MQPUT01B)</a></li>
+        <li><a href="#verificacao-fila">Verificando a Mensagem na Fila</a></li>
+        <li><a href="#get-batch">GET via Job Batch (MQGET01B)</a></li>
+        <li><a href="#get-cics">GET via Transação CICS (MQGET02C)</a></li>
+        <li><a href="#trigger">Trigger MQ → CICS (MQTRIGON)</a></li>
+        <li><a href="#conclusao">Conclusão</a></li>
+    </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="definicao-fila">1. Definição da Fila no MQ</h2>
+
+<p>Primeiro, vamos criar a fila <code>LAB.LOCAL.APP.REQ.CICS</code>.</p>
+
+<div class="terminal">
+<span class="cmd">DEFINE QLOCAL(LAB.LOCAL.APP.REQ.CICS)</span>
+<span class="cmd">    PUT(ENABLED)</span>
+<span class="cmd">    GET(ENABLED)</span>
+<span class="cmd">    USAGE(NORMAL)</span>
+<span class="cmd">    DESCR('FILA DE TESTE MQ CICS')</span>
+<span class="cmd">    REPLACE</span>
+</div>
+
+<div class="terminal">
+Queue name  . . . . . . . . . : LAB.LOCAL.APP.REQ.CICS
+Disposition . . . . . . . . : QMGR    CSQ7
+Description . . . . . . . . : FILA DE TESTE MQ CICS
+
+Put enabled . . . . . . . . : Y  Y=Yes, N=No
+Get enabled . . . . . . . . : Y  Y=Yes, N=No
+Usage . . . . . . . . . . . : N  N=Normal, X=XmitQ
+</div>
+
+<!-- ============================================================ -->
+<h2 id="put-batch">2. PUT via Job Batch</h2>
+
+<h3>2.1 Programa COBOL: MQPUT01B</h3>
+<p>O programa conecta ao QMGR <strong>CSQ7</strong>, abre a fila informada via <code>PARM</code> e envia a mensagem lida do cartão <strong>SYSIN</strong>.</p>
+<p> O fonte completo pode ser acessado aqui MQPUT01B</p>
+
+<div class="terminal">
+<span class="highlight">IDENTIFICATION DIVISION.</span>
+<span class="highlight">PROGRAM-ID. MQPUT01B.</span>
+
+<span class="highlight">DATA DIVISION.</span>
+<span class="highlight">WORKING-STORAGE SECTION.</span>
+
+<span class="highlight">01  MQ-CONSTANTS.</span>
+<span class="highlight">    COPY CMQV.</span>
+<span class="highlight">    COPY CMQODV.</span>
+<span class="highlight">    COPY CMQMDV.</span>
+<span class="highlight">    COPY CMQPMOV.</span>
+
+<span class="highlight">01  WS-QMGR-NAME           PIC X(48) VALUE 'CSQ7'.</span>
+<span class="highlight">01  WS-QUEUE-NAME-TEXT     PIC X(48) VALUE SPACES.</span>
+<span class="highlight">01  WS-MSG-LEN             PIC S9(9) COMP VALUE 100.</span>
+<span class="highlight">01  WS-HCONN               PIC S9(9) COMP VALUE 0.</span>
+<span class="highlight">01  WS-HOBJ                PIC S9(9) COMP VALUE 0.</span>
+<span class="highlight">01  WS-COMP-CODE           PIC S9(9) COMP VALUE 0.</span>
+<span class="highlight">01  WS-REASON-CODE         PIC S9(9) COMP VALUE 0.</span>
+</div>
+
+<h3>2.2 JCL para Execução</h3>
+
+<div class="terminal">
+<span class="comment">//JMQPUT01 JOB    ('00'),TSO.&SYSUID,NOTIFY=&SYSUID,</span>
+<span class="comment">//          MSGCLASS=T,MSGLEVEL=1,CLASS=A</span>
+<span class="comment">//*-------------------------------------------------------------*</span>
+<span class="comment">//*  COLOCAR MENSAGEM NA FILA                                   *</span>
+<span class="comment">//*-------------------------------------------------------------*</span>
+<span class="highlight">//STEP1    EXEC PGM=MQPUT01B,</span>
+<span class="highlight">//         PARM='LAB.LOCAL.APP.REQ.CICS'</span>
+<span class="highlight">//STEPLIB  DD DISP=SHR,DSN=USER.LOAD</span>
+<span class="highlight">//         DD DISP=SHR,DSN=CSQ701.SCSQLOAD</span>
+<span class="highlight">//         DD DISP=SHR,DSN=CSQ701.SCSQAUTH</span>
+<span class="highlight">//         DD DISP=SHR,DSN=CSQ701.SCSQANLE</span>
+<span class="highlight">//SYSPRINT DD SYSOUT=*</span>
+<span class="highlight">//SYSIN    DD *</span>
+<span class="cmd">MINHA MENSAGEM PERSONALIZADA VIA CARTAO MQMSG</span>
+<span class="highlight">/*</span>
+</div>
+
+<h3>2.3 Resultado da Execução</h3>
+
+<div class="img-placeholder">
+[IMAGEM 01 - Sysout do job MQPUT01B mostrando SUCCESSO - MENSAGEM ENVIADA]
+</div>
+
+<!-- ============================================================ -->
+<h2 id="verificacao-fila">3. Verificando a Mensagem na Fila</h2>
+
+<div class="terminal">
+<span class="cmd">/F CSQ7,DISPLAY QUEUE(LAB.LOCAL.APP.REQ.CICS) CURDEPTH</span>
+
+<span class="highlight">QUEUE(LAB.LOCAL.APP.REQ.CICS)</span>
+<span class="highlight">TYPE(QLOCAL)</span>
+<span class="highlight">CURDEPTH(1)</span>
+</div>
+
+<div class="img-placeholder">
+[IMAGEM 02 - Painel MQ mostrando a fila com CURDEPTH=1]
+</div>
+
+<!-- ============================================================ -->
+<h2 id="get-batch">4. GET via Job Batch</h2>
+
+<h3>4.1 JCL para Execução: MQGET01B</h3>
+
+<div class="terminal">
+<span class="comment">//JMQGET01 JOB    ('00'),TSO.&SYSUID,NOTIFY=&SYSUID,</span>
+<span class="comment">//          MSGCLASS=T,MSGLEVEL=1,CLASS=A</span>
+<span class="comment">//*-------------------------------------------------------------*</span>
+<span class="comment">//* EXECUTA PROGRAMA MQGET01B                                   *</span>
+<span class="comment">//*-------------------------------------------------------------*</span>
+<span class="highlight">//STEP1    EXEC PGM=MQGET01B,</span>
+<span class="highlight">//         PARM='LAB.LOCAL.APP.REQ.CICS'</span>
+<span class="highlight">//STEPLIB  DD DISP=SHR,DSN=USER.LOAD</span>
+<span class="highlight">//         DD DISP=SHR,DSN=CSQ701.SCSQLOAD</span>
+<span class="highlight">//         DD DISP=SHR,DSN=CSQ701.SCSQAUTH</span>
+<span class="highlight">//SYSPRINT DD SYSOUT=*</span>
+</div>
+<br>
+<p>
+Programa <strong>MQGET01B</strong> para consumir a mensagem via batch. O fonte completo pode ser acessao aqui.</p>
+<div class="terminal">
+
+       IDENTIFICATION DIVISION.                                     
+       PROGRAM-ID. MQGET01B.                                        
+                                                                    
+       DATA DIVISION.                                               
+       WORKING-STORAGE SECTION.                                     
+                                                                    
+       01  MQ-CONSTANTS.                                            
+           COPY CMQV.                                               
+           COPY CMQODV.                                             
+           COPY CMQMDV.                                             
+           COPY CMQGMOV.                                            
+                                                                    
+       01  WS-QMGR-NAME           PIC X(48) VALUE 'CSQ7'.           
+       01  WS-QUEUE-NAME-TEXT     PIC X(48) VALUE SPACES.           
+       01  WS-MSG-LEN             PIC S9(9) COMP VALUE 100.         
+       01  WS-MSG-DATA-LEN        PIC S9(9) COMP VALUE 0.           
+       01  WS-MSG-TEXT            PIC X(100) VALUE SPACES.          
+       01  WS-HCONN               PIC S9(9) COMP VALUE 0.           
+       01  WS-HOBJ                PIC S9(9) COMP VALUE 0.           
+       01  WS-COMP-CODE           PIC S9(9) COMP VALUE 0.           
+       01  WS-REASON-CODE         PIC S9(9) COMP VALUE 0.           
+       01  WS-DISP-COMP           PIC Z(9)9.                        
+       01  WS-DISP-REAS           PIC Z(9)9.                        
+
+</div>
+
+<h3>4.2 Resultado</h3>
+
+<div class="img-placeholder">
+[IMAGEM 03 - Sysout do job MQGET01B mostrando a mensagem lida]
+</div>
+
+<div class="terminal">
+<span class="cmd">/F CSQ7,DISPLAY QUEUE(LAB.LOCAL.APP.REQ.CICS) CURDEPTH</span>
+<span class="highlight">QUEUE(LAB.LOCAL.APP.REQ.CICS)
+TYPE(QLOCAL)
+CURDEPTH(1)</span>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="get-cics">5. GET via Transação CICS</h2>
+
+<h3>5.1 Definição dos Recursos  Transação TEST e programa MQGET02C no CICS</h3>
+
+<div class="terminal">
+<span class="cmd">CEDA DEF TRANSaction(TEST) GROUP(GAOR) PROGram(MQGET02C)</span>
+</div>
+<div class="terminal">
+CEDA  ALter TRANSaction( TEST )   
+ TRANSaction    : TEST            
+ Group          : GAOR            
+ DEScription  ==>                 
+ PROGram      ==> MQGET02C      
+</div>
+<br>
+<div class="terminal">
+<span class="cmd">CEDA DEFINE PROGram(MQGET02C) GROUP(GAOR) Language(CObol)</span>
+</div>
+<div class="terminal">
+CEDA  View PROGram( MQGET02C )   
+ PROGram        : MQGET02C       
+ Group          : GAOR           
+ DEScription    :                
+ Language       : CObol          
+
+</div>
+
+
+<h3>5.2 Recursos Instalados</h3>
+
+<div class="terminal">
+<span class="cmd">CEMT INQUIRE TRANSaction(TEST)</span>
+<span class="highlight"> Tra(TEST) Pri( 001 ) Pro(MQGET02C) Tcl( DFHTCL00 ) Ena Sta</span>
+
+<span class="cmd">CEMT INQUIRE PROGram(MQGET02C)</span>
+<span class="highlight"> Prog(MQGET02C) Leng(0000000000) Cob Pro Ena Pri</span>
+</div>
+
+<h3>5.3 Conexão com o MQ</h3>
+
+<div class="terminal">
+<span class="cmd">CEMT INQUIRE MQCONN</span>
+<span class="highlight"> Mqname( CSQ7 )  Mqqmgr(CSQ7)  Connectst( Connected )</span>
+</div>
+
+<h3>5.4 Programa MQGET02C</h3>
+
+O fonte completo do programa  <strong>MQGET02C</strong> pode ser acesso aqui
+<div class="terminal">
+        IDENTIFICATION DIVISION.                             
+        PROGRAM-ID. MQGET02C.                                
+                                                             
+        DATA DIVISION.                                       
+        WORKING-STORAGE SECTION.                             
+                                                             
+        01  MQ-OD-AREA.                                      
+            COPY CMQODV.                                     
+        01  MQ-MD-AREA.                                      
+            COPY CMQMDV.                                     
+        01  MQ-GMO-AREA.                                     
+            COPY CMQGMOV.                                    
+        01  MQ-CONST-AREA.                                   
+            COPY CMQV.                                       
+                                                             
+        01 WS-QUEUE-NAME-TEXT   PIC X(48) VALUE SPACES.      
+        01 WS-MSG-LEN           PIC S9(9) COMP VALUE 100.    
+        01 WS-MSG-DATA-LEN      PIC S9(9) COMP VALUE 0.      
+        01 WS-MSG-TEXT          PIC X(100) VALUE SPACES.     
+                                                             
+        01 WS-HCONN             PIC S9(9) COMP VALUE 0.      
+        01 WS-HOBJ              PIC S9(9) COMP VALUE 0.      
+        01 WS-COMP-CODE         PIC S9(9) COMP VALUE 0.      
+        01 WS-REASON-CODE       PIC S9(9) COMP VALUE 0.    
+</div>
+
+<h3>5.5 Executando a Transação</h3>
+
+<div class="img-placeholder">
+[IMAGEM 04 - Terminal CICS após executar a transação TEST]
+</div>
+
+<h3>5.6 Visualizando a TS via CEBR</h3>
+
+<div class="img-placeholder">
+[IMAGEM 05 - Tela do CEBR mostrando o conteúdo da TS TEST]
+</div>
+
+<!-- ============================================================ -->
+<h2 id="trigger">6. Trigger MQ → CICS</h2>
+<p>Configurando um trigger no MQ para executar transação CICS.</p>
+<h3>6.1 PROCESS no MQ</h3>
+
+<div class="terminal">
+<span class="cmd">DEFINE PROCESS(LAB.PROCESS.CICS.TRIG)</span>
+<span class="cmd">    APPLTYPE(CICS)</span>
+<span class="cmd">    APPLICID('TRIG')</span>
+<span class="cmd">    DESCR('ACIONA TRANSACAO TRIG NO CICS')</span>
+<span class="cmd">    REPLACE</span>
+</div>
+
+<h3>6.2 Trigger na Fila</h3>
+
+<div class="terminal">
+<span class="cmd">ALTER QLOCAL(LAB.LOCAL.APP.REQ.CICS)</span>
+<span class="cmd">    TRIGGER(ON)</span>
+<span class="cmd">    TRIGTYPE(FIRST)</span>
+<span class="cmd">    TRIGDPTH(1)</span>
+<span class="cmd">    INITQ(CSQ7.TRIGGER.CICSA02)</span>
+<span class="cmd">    PROCESS(LAB.PROCESS.CICS.TRIG)</span>
+</div>
+
+<h3>6.3 Recursos CICS</h3>
+
+<div class="terminal">
+<span class="cmd">CEDA VIEW TRANSaction(TRIG)</span>
+<span class="highlight"> TRANSaction    : TRIG    PROGram        : MQTRIGON</span>
+
+<span class="cmd">CEDA VIEW MQconn(CSQ7)</span>
+<span class="highlight"> Initqname      : CSQ7.TRIGGER.CICSA02</span>
+</div>
+
+<h3>6.4 Disparando o Trigger</h3>
+
+<div class="img-placeholder">
+[IMAGEM 06 - Sysout do job MQPUT01B - terceira execução]
+</div>
+
+<div class="terminal">
+<span class="cmd">CEMT INQUIRE MQCONN</span>
+<span class="highlight"> Tasks(0001)  Trigmontasks(0001)  ← Trigger processado!</span>
+</div>
+
+<div class="img-placeholder">
+[IMAGEM 07 - TS TEST mostrando a mensagem processada pelo trigger]
+</div>
+
+<!-- ============================================================ -->
+<h2 id="conclusao">7. Conclusão</h2>
+
+<div class="card">
+<p><span class="check">✅</span> <strong>MQPUT01B</strong> - PUT via batch com mensagem do cartão JCL</p>
+<p><span class="check">✅</span> <strong>MQGET01B</strong> - GET via batch com fila via PARM</p>
+<p><span class="check">✅</span> <strong>MQGET02C</strong> - GET via CICS com gravação em TS</p>
+<p><span class="check">✅</span> <strong>MQTRIGON</strong> - Trigger MQ → CICS automático</p>
+<p><span class="check">✅</span> <strong>CEBR</strong> - Visualização da TS para depuração</p>
+</div>
+
+<p style="text-align:center; margin-top:40px;"><a href="#">🔝 Voltar ao topo</a></p>
+
+</body>
+</html>
