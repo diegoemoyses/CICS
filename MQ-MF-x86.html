@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guia prático de integração Mainframe com Windows usando IBM MQ. COBOL, CICS e MQ Series passo a passo.">
+    <meta name="keywords" content="mainframe, cobol, cics, ibm mq, integração, mensageria">
+    <meta property="og:title" content="🚀 Integrando Mainframe e Windows com IBM MQ">
+    <meta property="og:description" content="Guia prático de mensageria entre ambientes Mainframe e x86 com COBOL, CICS e MQ Series">
+    <meta property="og:type" content="article">
+    <title>🚀 Integrando Mainframe e x86 com IBM MQ - Guia Prático</title>
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --link-color: #0969da;
+            --code-bg: #0c0c0c;
+            --heading-color: #1f2328;
+            --table-stripe: #f6f8fa;
+            --inline-code: #d73a49;
+            --success-color: #1a7f37;
+            --terminal-bg: #0c0c0c;
+            --terminal-text: #00ff41;
+            --img-bg: #0a0a0a;
+            --img-border: #d0d7de;
+            --flow-mf: #0969da;
+            --flow-win: #1a7f37;
+            --flow-arrow: #cf222e;
+            --flow-label: #656d76;
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+        
+        h1 { 
+            font-size: 2.2rem; 
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.2rem; border-bottom: none; }
+        
+        a { 
+            color: var(--link-color); 
+            text-decoration: none; 
+        }
+        
+        a:hover { 
+            text-decoration: underline;
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+        }
+        
+        :not(pre) > code {
+            background-color: var(--table-stripe);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--inline-code);
+            border: 1px solid var(--border-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.7rem;
+            text-align: left;
+        }
+        
+        th { 
+            background-color: var(--table-stripe); 
+            font-weight: 600; 
+        }
+        
+        tr:nth-child(even) { 
+            background-color: var(--table-stripe); 
+        }
+        
+        ul, ol { 
+            margin: 0.75rem 0; 
+            padding-left: 2rem; 
+        }
+        
+        li { 
+            margin: 0.3rem 0; 
+        }
+        
+        blockquote {
+            border-left: 4px solid var(--link-color);
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            background-color: var(--table-stripe);
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .toc {
+            background-color: var(--table-stripe);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .toc ul { 
+            list-style: none; 
+            padding-left: 0; 
+        }
+        
+        .toc li { 
+            margin: 0.4rem 0; 
+        }
+        
+        .toc a { 
+            font-weight: 500; 
+        }
+        
+        .success { 
+            color: var(--success-color); 
+        }
+        
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-text);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+            position: relative;
+        }
+        
+
+        .terminal-x86 {
+            background-color: var(--terminal-bg);
+            color: #F2F2F2;
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            box-shadow: 0 0 10px rgba(0, 120, 212, 0.2);
+            position: relative;
+        }
+        
+
+        
+        .terminal pre, .terminal-x86 pre {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: inherit;
+        }
+        
+        .img-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Fluxo CSS - Diagrama de Arquitetura */
+        .flow-container {
+            background: #f6f8fa;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .flow-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .flow-platforms {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .flow-platform {
+            flex: 1;
+            min-width: 280px;
+            max-width: 420px;
+        }
+        
+        .flow-platform-header {
+            font-weight: 700;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            border-radius: 8px 8px 0 0;
+            color: #fff;
+        }
+        
+        .flow-mf-header { background: var(--flow-mf); }
+        .flow-win-header { background: var(--flow-win); }
+        
+        .flow-platform-body {
+            border: 2px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+        
+        .flow-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 0.82em;
+        }
+        
+        .flow-item strong { color: var(--heading-color); }
+        
+        .flow-arrows {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .flow-arrow-box {
+            background: #fff;
+            border: 2px solid var(--flow-arrow);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 700;
+            color: var(--flow-arrow);
+            font-size: 0.85em;
+        }
+        
+        .flow-arrow-symbol {
+            font-size: 1.5em;
+            color: var(--flow-arrow);
+            font-weight: bold;
+        }
+        
+        .flow-trigger-box {
+            background: #fff3cd;
+            border: 2px solid #d2991d;
+            border-radius: 8px;
+            padding: 8px 15px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: 600;
+            color: #9a6700;
+            font-size: 0.85em;
+        }
+        
+        .alert-info {
+            background: #f0f7ff;
+            border-left: 4px solid var(--link-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .alert-success {
+            background: #f0fff4;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .badges-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            pre { font-size: 0.75rem; }
+            .terminal, .terminal-x86 { font-size: 0.75rem; }
+            .flow-platforms { flex-direction: column; gap: 15px; }
+            .flow-platform { min-width: auto; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚀 Integrando Mainframe e Plataforma x86 com IBM MQ</h1>
+<p><strong>Autor:</strong> <a href="https://github.com/diegoemoyses">Diego Eduardo Moysés <img src="https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github" alt="GitHub"></a></p>
+
+<h3>
+Exemplo prático de mensageria entre ambientes Mainframe e x86 utilizando o IBM MQ.
+</h3>
+
+
+<div class="flow-container">
+    <div class="flow-title">📊 Arquitetura da Integração com MQ</div>
+
+    <div class="flow-platforms">
+ 
+        <div class="flow-platform">
+            <div class="flow-platform-header flow-mf-header">💻 Mainframe (CSQ7)</div>
+            <div class="flow-platform-body">
+                <div class="flow-item"><strong>Receiver:</strong> QM1.TO.CSQ7</div>
+                <div class="flow-item"><strong>Sender:</strong> CSQ7.TO.QM1</div>
+                <div class="flow-item"><strong>XMITQ:</strong> QM1.XMIT.QUEUE</div>
+                <div class="flow-item"><strong>Fila Requisição:</strong> LAB.LOCAL.APP.REQ.CICS (Trigger)</div>
+                <div class="flow-item"><strong>Fila Resposta:</strong> LAB.REMOTE.QM01.RECEBE.ZOS (QREMOTE)</div>
+            </div>
+        </div>
+
+        <!-- Windows -->
+        <div class="flow-platform">
+            <div class="flow-platform-header flow-win-header">🖥️ *Windows X86 (QM1)</div>
+            <div class="flow-platform-body">
+                <div class="flow-item"><strong>Sender:</strong> QM1.TO.CSQ7</div>
+                <div class="flow-item"><strong>Receiver:</strong> CSQ7.TO.QM1</div>
+                <div class="flow-item"><strong>XMITQ:</strong> CSQ7.XMIT.QUEUE</div>
+                <div class="flow-item"><strong>Fila Envio:</strong> LAB.REMOTE.APP.REQ.CICS (QREMOTE)</div>
+                <div class="flow-item"><strong>Fila Resposta:</strong> LAB.APP.RECEBE.ZOS (QLOCAL)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fluxo de Mensagens -->
+    <div style="margin-top:20px;">
+        <div class="flow-arrows">
+            <div class="flow-arrow-box">📤 PUT Request</div>
+            <div class="flow-arrow-symbol">→</div>
+            <div class="flow-arrow-box">XMITQ</div>
+            <div class="flow-arrow-symbol">→</div>
+            <div class="flow-arrow-box">Sender</div>
+            <div class="flow-arrow-symbol">→</div>
+            <div class="flow-arrow-box">TCP :1414</div>
+            <div class="flow-arrow-symbol">→</div>
+            <div class="flow-arrow-box">Receiver</div>
+        </div>
+
+        <div class="flow-trigger-box">⚡ TRIGGER → Transação WINX → Programa MQRESWIN (CICS)</div>
+
+        <div class="flow-arrows">
+            <div class="flow-arrow-box">PUT Response</div>
+            <div class="flow-arrow-symbol">←</div>
+            <div class="flow-arrow-box">XMITQ</div>
+            <div class="flow-arrow-symbol">←</div>
+            <div class="flow-arrow-box">Sender</div>
+            <div class="flow-arrow-symbol">←</div>
+            <div class="flow-arrow-box">TCP :1415</div>
+            <div class="flow-arrow-symbol">←</div>
+            <div class="flow-arrow-box">Receiver</div>
+            <div class="flow-arrow-symbol">←</div>
+            <div class="flow-arrow-box">📥 GET Response</div>
+        </div>
+    </div>
+</div>
+
+<p>
+<strong>*Observação:</strong> neste guia é utilizando o sistema operacional <strong>Windows</strong> para o x86 mas o mesmo pode ser aplicado para versão <strong>Linux</strong>.<br><br>
+
+<div class="toc">
+    <h3>📑 Sumário</h3>
+    <ol>
+        <li><a href="#def_mf">Ambiente Mainframe</a></li>
+        <li><a href="#def_x86">Ambiente x86</a></li>
+        <li><a href="#def_cob">Programa Cobol CICS</a></li>
+        <li><a href="#def_cics">Transação no CICS</a></li>
+        <li><a href="#exec">Enviando e Recebendo mensagens</a></li>
+    </ol>
+</div>
+
+<hr>
+
+<h2 id="def_mf">1. No ambiente Mainframe vamos definir.</h2>
+
+<div class="alert-info">
+    <strong>💡 Nota:</strong> Execute os comandos abaixo no console do MQ Series (CSQ7) no Mainframe.
+</div>
+
+<h3>Canal Sender:</h3>
+<div class="terminal">
+<pre>DEFINE CHANNEL('CSQ7.TO.QM1') +
+       CHLTYPE(SDR) +
+       TRPTYPE(TCP) +
+       CONNAME('10.0.0.2(1415)') +
+       XMITQ('QM1.XMIT.QUEUE') +
+       REPLACE</pre>
+</div>
+
+<h3>Canal Receiver:</h3>
+<div class="terminal">
+<pre>DEFINE CHANNEL('QM1.TO.CSQ7') +
+       CHLTYPE(RCVR) +
+       TRPTYPE(TCP) +
+       REPLACE</pre>
+</div>
+
+<h3>Fila XMIT:</h3>
+<div class="terminal">
+<pre>DEFINE QLOCAL('QM1.XMIT.QUEUE') +
+       USAGE(XMITQ) +
+       REPLACE</pre>
+</div>
+
+<h3>Fila de requisições:</h3>
+<p><strong>Observação:</strong> esta fila irá acionar via trigger a transação CICS que irá processar a mensagem e postar a resposta. 
+Mais detalhes de como configurar fila trigger com CICS pode ser encontrado em <a href="https://diegoemoyses.github.io/CICS/MQ-Batch-CICS-Trigger">Mensageria com Job Batch, Transação CICS e Trigger</a>.</p>
+
+<div class="terminal">
+<pre>DEFINE QLOCAL('LAB.LOCAL.APP.REQ.CICS') +
+       USAGE(NORMAL) +
+       TRIGGER +
+       TRIGTYPE(FIRST) +
+       TRIGDPTH(1) +
+       INITQ('CSQ7.TRIGGER.CICSA02') +
+       PROCESS('LAB.PROCESS.CICS.WIN') +
+       PUT(ENABLED) +
+       GET(ENABLED) +
+       SHARE +
+       DEFSOPT(SHARED) +
+       REPLACE</pre>
+</div>
+
+<h3>Fila de resposta:</h3>
+<div class="terminal">
+<pre>DEFINE QREMOTE('LAB.REMOTE.QM01.RECEBE.ZOS') +
+       RNAME('LAB.APP.RECEBE.ZOS') +
+       RQMNAME('QM1') +
+       XMITQ('QM1.XMIT.QUEUE') +
+       PUT(ENABLED) +
+       REPLACE</pre>
+</div>
+
+<hr>
+
+<h2 id="def_x86">2. Ambiente x86 Windows</h2>
+
+<div class="alert-info">
+    <strong>💡 Nota:</strong> Execute estes comandos no <code>runmqsc QM1</code> do Windows.
+</div>
+
+<h3>Canal Sender:</h3>
+<div class="terminal-x86">
+<pre>DEFINE CHANNEL('QM1.TO.CSQ7') +
+       CHLTYPE(SDR) +
+       TRPTYPE(TCP) +
+       CONNAME('10.0.0.1(1414)') + 
+       XMITQ('CSQ7.XMIT.QUEUE') +
+       DESCR('Canal para o ZOS') +
+       REPLACE</pre>
+</div>
+
+<h3>Canal Receiver:</h3>
+<div class="terminal-x86">
+<pre>DEFINE CHANNEL('CSQ7.TO.QM1') +
+       CHLTYPE(RCVR) +
+       TRPTYPE(TCP) +
+       SSLCAUTH(OPTIONAL) +
+       DESCR('RECEIVER DO ZOS') +
+       REPLACE</pre>
+</div>
+
+<h3>Fila XMIT:</h3>
+<div class="terminal-x86">
+<pre>DEFINE QLOCAL('CSQ7.XMIT.QUEUE') +
+       USAGE(XMITQ) +
+       DESCR('Fila XMIT para o Mainframe') +
+       REPLACE</pre>
+</div>
+
+<h3>Fila para enviar mensagem ao Mainframe:</h3>
+<div class="terminal-x86">
+<pre>DEFINE QREMOTE('LAB.REMOTE.APP.REQ.CICS') +
+       RNAME('LAB.LOCAL.APP.REQ.CICS') +
+       RQMNAME('CSQ7') +
+       XMITQ('CSQ7.XMIT.QUEUE') +
+       PUT(ENABLED) +
+       DESCR('Fila remota para o ZOS CSQ7') +
+       REPLACE</pre>
+</div>
+
+<h3>Fila para receber a reposta:</h3>
+<div class="terminal-x86">
+<pre>DEFINE QLOCAL('LAB.APP.RECEBE.ZOS') +
+       USAGE(NORMAL) +
+       DESCR('Recebe mensagens do ZOS') +
+       PUT(ENABLED) +
+       GET(ENABLED) +
+       SHARE +
+       REPLACE</pre>
+</div>
+
+<hr>
+
+<h2 id="def_cob">3. Programa COBOL CICS</h2>
+
+<p>O programa <strong>MQRESWIN</strong> irá ler a mensagem postada pelo MQ Windows e devolver uma mensagem de resposta. 
+O Fonte completo pode ser acessado <a href="MQRESWIN.cob">aqui</a>.
+</p>
+
+<div class="terminal">
+<pre>       IDENTIFICATION DIVISION.
+       PROGRAM-ID. MQRESWIN.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01  MQ-OD-AREA.
+           COPY CMQODV.
+       01  MQ-MD-AREA.
+           COPY CMQMDV.
+       01  MQ-GMO-AREA.
+           COPY CMQGMOV.
+       01  MQ-CONST-AREA.
+           COPY CMQV.
+       01  MQ-PMO-AREA.
+           COPY CMQPMOV.
+
+       01  WS-QUEUE-NAME-TEXT  PIC X(48) VALUE SPACES.
+       01  WS-MSG-LEN          PIC S9(9) COMP VALUE 56.
+       01  WS-MSG-DATA-LEN     PIC S9(9) COMP VALUE 0.
+       01  WS-HCONN            PIC S9(9) COMP VALUE 0.
+       01  WS-HOBJ             PIC S9(9) COMP VALUE 0.
+       01  WS-COMP-CODE        PIC S9(9) COMP VALUE 0.
+       01  WS-REASON-CODE      PIC S9(9) COMP VALUE 0.</pre>
+</div>
+
+<blockquote>
+    <strong>🔑 Ponto Chave:</strong> Este programa usa as copylibs padrão do MQ (CMQODV, CMQMDV, CMQGMOV, CMQV, CMQPMOV) 
+    e implementa o fluxo MQGET → Processamento → MQPUT para responder ao Windows.
+</blockquote>
+
+<hr>
+
+<h2 id="def_cics">4. Transação no CICS</h2>
+
+<h3>Definir e instalar a transação <strong>WINX</strong> apontando para o programa <strong>MQRESWIN</strong></h3>
+
+<div class="terminal">
+<pre>CEDA DEFINE TRANSACTION('WINX') -
+       GROUP('GAOR') -
+       PROGRAM('MQRESWIN') -
+       STATUS(ENABLED) -
+       ISOLATE(YES) -
+       REPLACE</pre>
+</div>
+
+<div class="alert-info">
+    <strong>⚠️ Atenção:</strong> caso não esteja em ambiente configurado para autoinstall (PROGAUTOINST) de programas na chamada, 
+    defina também o programa no CICS:
+</div>
+
+<div class="terminal">
+<pre>CEDA DEFINE PROGRAM('MQRESWIN') -
+       GROUP('GAOR') -
+       LANGUAGE(COBOL) -
+       STATUS(ENABLED) -
+       REPLACE</pre>
+</div>
+
+<hr>
+
+<h2 id="exec">5. Enviando e Recebendo mensagens</h2>
+
+<div class="alert-success">
+    <strong>🎯 Hora do teste!</strong> Vamos postar a mensagem <strong>"OLA ZOS! VOCE ESTA AI?"</strong> 
+    na fila <code>LAB.REMOTE.APP.REQ.CICS</code> através da interface Web do MQ Windows.
+</div>
+
+<div class="img-container">
+    <img src="put-msg-to-zos.png" alt="Enviando mensagem para o Mainframe via MQ Web Console">
+    <p style="text-align: center; color: #656d76; font-size: 0.9rem;">
+        <em>Interface Web do MQ no Windows enviando requisição para o Mainframe</em>
+    </p>
+</div>
+
+<hr>
+
+<h3>📊 Log da Transação CICS (TS WIN)</h3>
+<p>Com o fluxo funcionando perfeitamente, podemos consultar na TS WIN do CICS um log com a mensagem recebida e qual foi a resposta do programa <strong>MQRESWIN</strong>.</p>
+
+<div class="img-container">
+    <img src="TS-CICS-WIN.png" width="750" alt="Log da transação CICS mostrando mensagem processada">
+    <p style="text-align: center; color: #656d76; font-size: 0.9rem;">
+        <em>TS WIN exibindo: mensagem recebida → processamento → resposta enviada</em>
+    </p>
+</div>
+
+<hr>
+
+<h3>✅ Conferindo a resposta na fila LAB.APP.RECEBE.ZOS do MQ Windows.</h3>
+
+<div class="img-container">
+    <img src="RESP-ZOS-WIN.png" width="750" alt="Resposta recebida no MQ Windows do Mainframe">
+    <p style="text-align: center; color: #656d76; font-size: 0.9rem;">
+        <em>Fila LAB.APP.RECEBE.ZOS no Windows com a resposta do Mainframe</em>
+    </p>
+</div>
+
+
+
+<blockquote>
+    <strong>🎯 Conclusão:</strong> Com este exemplo prático demonstramos como as diferentes plataformas e arquiteturas podem conversar utilizando o <strong>IBM MQ</strong> como intermediador. A comunicação é confiável, assíncrona e com garantia de entrega.
+</blockquote>
+
+<!-- BADGES TÉCNICAS -->
+<div class="badges-container">
+    <img src="https://img.shields.io/badge/Mainframe-Z%2FOS-blue?style=for-the-badge&logo=ibm" alt="Mainframe">
+    <img src="https://img.shields.io/badge/COBOL-CICS-green?style=for-the-badge" alt="COBOL CICS">
+    <img src="https://img.shields.io/badge/IBM-MQ-red?style=for-the-badge&logo=ibm" alt="IBM MQ">
+    <img src="https://img.shields.io/badge/Windows-X86-lightgrey?style=for-the-badge&logo=windows" alt="Windows">
+</div>
+
+<p style="text-align: center; margin-top: 2rem;">
+    <a href="#">🔝 Voltar ao topo</a>
+</p>
+
+</body>
+</html>
