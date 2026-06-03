@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guia prático de API REST com CICS TS. Servindo e consumindo APIs no Mainframe com COBOL.">
+    <meta name="keywords" content="mainframe, cobol, cics, rest api, json, integração, modernização">
+    <meta property="og:title" content="🔌 API REST no CICS - Guia Prático">
+    <meta property="og:description" content="Guia prático para servir e consumir APIs REST no CICS TS com COBOL">
+    <meta property="og:type" content="article">
+    <title>🔌 API REST no Mainframe - Servindo e Consumindo APIs com CICS e COBOL</title>
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --link-color: #0969da;
+            --code-bg: #0c0c0c;
+            --heading-color: #1f2328;
+            --table-stripe: #f6f8fa;
+            --inline-code: #d73a49;
+            --success-color: #1a7f37;
+            --terminal-bg: #0c0c0c;
+            --terminal-text: #00ff41;
+            --img-bg: #0a0a0a;
+            --img-border: #d0d7de;
+            --flow-mf: #0969da;
+            --flow-ext: #1a7f37;
+            --flow-arrow: #cf222e;
+            --flow-label: #656d76;
+            --api-server: #8250df;
+            --api-client: #0969da;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+        
+        h1 { font-size: 2.2rem; border-bottom: 2px solid var(--border-color); }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.2rem; border-bottom: none; }
+        h4 { font-size: 1.0rem; border-bottom: none; color: #656d76; }
+        
+        a { color: var(--link-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+        
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+        }
+        
+        :not(pre) > code {
+            background-color: var(--table-stripe);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--inline-code);
+            border: 1px solid var(--border-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.7rem;
+            text-align: left;
+        }
+        
+        th { background-color: var(--table-stripe); font-weight: 600; }
+        tr:nth-child(even) { background-color: var(--table-stripe); }
+        
+        ul, ol { margin: 0.75rem 0; padding-left: 2rem; }
+        li { margin: 0.3rem 0; }
+        
+        blockquote {
+            border-left: 4px solid var(--link-color);
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            background-color: var(--table-stripe);
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .toc {
+            background-color: var(--table-stripe);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin: 0.4rem 0; }
+        .toc a { font-weight: 500; }
+        
+        .success { color: var(--success-color); }
+        
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-text);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+        
+        .terminal-windows {
+            background-color: #0c0c0c;
+            color: #f2f2f2;
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            box-shadow: 0 0 10px rgba(0, 120, 212, 0.2);
+        }
+        
+        .terminal pre, .terminal-windows pre {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: inherit;
+        }
+        
+        .img-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .flow-container {
+            background: #f6f8fa;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .flow-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .flow-platforms {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .flow-platform {
+            flex: 1;
+            min-width: 280px;
+            max-width: 420px;
+        }
+        
+        .flow-platform-header {
+            font-weight: 700;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            border-radius: 8px 8px 0 0;
+            color: #fff;
+        }
+        
+        .flow-server-header { background: var(--api-server); }
+        .flow-client-header { background: var(--api-client); }
+        .flow-external-header { background: var(--flow-ext); }
+        
+        .flow-platform-body {
+            border: 2px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+        
+        .flow-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 0.82em;
+        }
+        
+        .flow-item strong { color: var(--heading-color); }
+        
+        .flow-arrows {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .flow-arrow-box {
+            background: #fff;
+            border: 2px solid var(--flow-arrow);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 700;
+            color: var(--flow-arrow);
+            font-size: 0.85em;
+        }
+        
+        .flow-arrow-symbol {
+            font-size: 1.5em;
+            color: var(--flow-arrow);
+            font-weight: bold;
+        }
+        
+        .alert-info {
+            background: #f0f7ff;
+            border-left: 4px solid var(--link-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .alert-success {
+            background: #f0fff4;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .alert-warning {
+            background: #fff8f0;
+            border-left: 4px solid #d2991d;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .badges-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .cics-view {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            border: 2px solid #8250df;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            overflow-x: auto;
+        }
+        
+        .cics-view pre {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: #e0e0e0;
+        }
+        
+        .highlight { color: #00ff41; font-weight: bold; }
+        
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            pre { font-size: 0.7rem; }
+            .terminal, .terminal-windows { font-size: 0.7rem; }
+            .flow-platforms { flex-direction: column; gap: 15px; }
+            .flow-platform { min-width: auto; max-width: none; }
+        }
+        
+        .site-disclaimer-footer {
+            margin-top: 50px;
+            padding-bottom: 20px;
+            text-align: center;
+            font-family: sans-serif;
+        }
+        
+        .disclaimer-divider {
+            border: 0;
+            border-top: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            width: 60%;
+        }
+        
+        .site-disclaimer-footer p {
+            font-size: 13px;
+            color: #666666;
+        }
+        
+        .disclaimer-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .disclaimer-link:hover {
+            text-decoration: underline;
+            color: #004499;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔌 API REST no Mainframe</h1>
+<p><strong>Autor:</strong> <a href="https://github.com/diegoemoyses">Diego Eduardo Moysés <img src="https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github" alt="GitHub"></a></p>
+
+<h3>Guia prático para servir e consumir APIs REST no CICS TS com COBOL, HTTP e JSON.</h3>
+
+<!-- DIAGRAMA DE ARQUITETURA -->
+<!-- NOVA ARQUITETURA - Diagrama de Camadas -->
+<div class="flow-container" style="background: linear-gradient(135deg, #f5f0ff 0%, #f0f5ff 100%);">
+    <div class="flow-title" style="font-size: 1.4em;">📊 Arquitetura REST no CICS TS</div>
+    
+    <p style="text-align: center; color: #656d76; margin-bottom: 20px; font-size: 0.9em;">
+        <strong>Duas funções:</strong> Servidor REST (recebe chamadas) e Cliente REST (faz chamadas)
+    </p>
+
+    <!-- CAMADA 1: SERVIDOR -->
+    <div style="background: #fff; border: 2px solid #8250df; border-radius: 12px; padding: 20px; margin-bottom: 25px; position: relative;">
+        <div style="position: absolute; top: -15px; left: 20px; background: #8250df; color: #fff; padding: 5px 20px; border-radius: 20px; font-weight: 700; font-size: 1em;">
+            🟣 MODO SERVIDOR — CICS responde a chamadas externas
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center;">
+            <!-- Cliente Externo -->
+            <div style="background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 15px; text-align: center; min-width: 120px;">
+                <div style="font-size: 2em;">💻</div>
+                <div style="font-weight: 700; color: #24292f;">Cliente</div>
+                <div style="font-size: 0.75em; color: #656d76;">curl / navegador</div>
+            </div>
+            
+            <div style="font-size: 1.5em; color: #8250df; font-weight: bold;">GET →</div>
+            
+            <!-- CICS Stack -->
+            <div style="background: #f6f8fa; border: 2px solid #8250df; border-radius: 8px; padding: 0; min-width: 350px; overflow: hidden;">
+                <div style="background: #8250df; color: #fff; padding: 8px 15px; font-weight: 700; font-size: 0.9em;">
+                    🏗️ Dentro do CICS
+                </div>
+                <div style="padding: 10px 15px;">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #8250df20; color: #8250df; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">PORT</span>
+                        <span style="font-size: 0.85em;">TCPIPSERVICE :08080</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #8250df20; color: #8250df; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">ROTA</span>
+                        <span style="font-size: 0.85em;">URIMAP /api/v1/cics/info</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #8250df20; color: #8250df; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">EXEC</span>
+                        <span style="font-size: 0.85em;">TRANS SAPI → PROG APISERVE</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0;">
+                        <span style="background: #8250df20; color: #8250df; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">SAÍDA</span>
+                        <span style="font-size: 0.85em;">JSON + UTF-8 → 200 OK</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="font-size: 1.5em; color: #1a7f37; font-weight: bold;">JSON →</div>
+            
+            <!-- Resposta -->
+            <div style="background: #f0fff4; border: 1px solid #1a7f37; border-radius: 8px; padding: 15px; text-align: center; min-width: 120px;">
+                <div style="font-size: 2em;">📦</div>
+                <div style="font-weight: 700; color: #1a7f37;">Resposta</div>
+                <div style="font-size: 0.75em; color: #656d76;">{ "status": "ok" }</div>
+            </div>
+        </div>
+    </div>
+<br>
+    <!-- CAMADA 2: CLIENTE -->
+    <div style="background: #fff; border: 2px solid #0969da; border-radius: 12px; padding: 20px; position: relative;">
+        <div style="position: absolute; top: -15px; left: 20px; background: #0969da; color: #fff; padding: 5px 20px; border-radius: 20px; font-weight: 700; font-size: 1em;">
+            🔵 MODO CLIENTE — CICS consome APIs externas
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center;">
+            <!-- CICS Client Stack -->
+            <div style="background: #f6f8fa; border: 2px solid #0969da; border-radius: 8px; padding: 0; min-width: 350px; overflow: hidden;">
+                <div style="background: #0969da; color: #fff; padding: 8px 15px; font-weight: 700; font-size: 0.9em;">
+                    🏗️ Dentro do CICS
+                </div>
+                <div style="padding: 10px 15px;">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #0969da20; color: #0969da; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">ALVO</span>
+                        <span style="font-size: 0.85em;">URIMAP → api.open-notify.org:80</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #0969da20; color: #0969da; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">MÉTODO</span>
+                        <span style="font-size: 0.85em;">WEB OPEN → WEB CONVERSE GET</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e0e0e0;">
+                        <span style="background: #0969da20; color: #0969da; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">EXEC</span>
+                        <span style="font-size: 0.85em;">TRANS ISSG → PROG TESTGET</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 5px 0;">
+                        <span style="background: #0969da20; color: #0969da; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600;">RECEBE</span>
+                        <span style="font-size: 0.85em;">JSON da ISS ← 200 OK</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="font-size: 1.5em; color: #cf222e; font-weight: bold;">GET →</div>
+            
+            <!-- API Externa -->
+            <div style="background: #fff8f0; border: 2px solid #d2991d; border-radius: 8px; padding: 15px; text-align: center; min-width: 140px;">
+                <div style="font-size: 2em;">🛰️</div>
+                <div style="font-weight: 700; color: #9a6700;">API Externa</div>
+                <div style="font-size: 0.75em; color: #656d76;">open-notify.org</div>
+                <div style="font-size: 0.7em; color: #656d76; margin-top: 5px;">ISS Location</div>
+            </div>
+            
+            <div style="font-size: 1.5em; color: #1a7f37; font-weight: bold;">JSON ←</div>
+            
+            <!-- Resposta -->
+            <div style="background: #f0fff4; border: 1px solid #1a7f37; border-radius: 8px; padding: 15px; text-align: center; min-width: 120px;">
+                <div style="font-size: 2em;">📍</div>
+                <div style="font-weight: 700; color: #1a7f37;">Posição ISS</div>
+                <div style="font-size: 0.75em; color: #656d76;">lat: -33.86</div>
+                <div style="font-size: 0.75em; color: #656d76;">lon: 151.20</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toc">
+    <h3>📑 Sumário</h3>
+    <ol>
+        <li><a href="#server">Parte 1: Servindo uma API REST</a>
+            <ul>
+                <li><a href="#s1-tcpip">TCPIPSERVICE</a></li>
+                <li><a href="#s1-urimap">URIMAP Server</a></li>
+                <li><a href="#s1-trans">Transação</a></li>
+                <li><a href="#s1-prog">Programa COBOL</a></li>
+                <li><a href="#s1-test">Teste</a></li>
+            </ul>
+        </li>
+        <li><a href="#client">Parte 2: Consumindo uma API REST</a>
+            <ul>
+                <li><a href="#c1-urimap">URIMAP Client</a></li>
+                <li><a href="#c1-trans">Transação</a></li>
+                <li><a href="#c1-prog">Programa COBOL</a></li>
+                <li><a href="#c1-test">Teste</a></li>
+            </ul>
+        </li>
+        <li><a href="#conclusao">Conclusão</a></li>
+		<li><a href="#praticas">Práticas de Mercado</a></li>
+    </ol>
+</div>
+
+<hr>
+
+<h2 id="prereq">📋 Pré-requisitos</h2>
+
+<blockquote>
+ A SIT do CICS precisa ter <code>TCPIP=YES</code> para habilitar o suporte a HTTP. 
+    Verifique também se o DNS está configurado no arquivo <code>DFHXXX.TCPIP.DATA</code> com <code>NSINTERADDR 8.8.8.8</code>.
+</blockquote>
+
+<br>
+<h2 id="server">🟣 Parte 1: Servindo uma API REST</h2>
+
+<blockquote>
+    <strong>🎯 Objetivo:</strong> Criar um endpoint <code>/api/v1/cics/info</code> que retorna um JSON com informações 
+    do ambiente CICS (job, usuário, data, hora).
+</blockquote>
+
+<h2 id="s1-tcpip">1.1 TCPIPSERVICE - O Listener HTTP</h2>
+
+<p>O <code>TCPIPSERVICE</code> é o recurso que escuta em uma porta TCP e recebe as requisições HTTP.</p>
+
+<div class="cics-view">
+<pre> CEDA  View TCpipservice( HTTP8080 )  
+ TCpipservice   : <span class="highlight">HTTP8080</span>           
+ GROup          : GAPI               
+ Urm            : <span class="highlight">DFHWBAAX</span>           
+ POrtnumber     : <span class="highlight">08080</span>              
+ STatus         : Open               
+ PROtocol       : Http               
+ TRansaction    : <span class="highlight">CWXN</span>               
+ Backlog        : 00001              
+ Host           : ANY                
+ Ipaddress      : ANY                
+ Maxdatalen     : 000032</pre>
+</div>
+
+<div class="alert-info">
+    <strong>🔑 Pontos Chave:</strong>
+    <ul>
+        <li><code>URM(DFHWBAAX)</code> - Analyzer padrão que roteia para URIMAPs</li>
+        <li><code>TRANSACTION(CWXN)</code> - Transação padrão do CICS Web Support</li>
+        <li><code>PORTNUMBER(08080)</code> - Porta onde o CICS vai escutar</li>
+    </ul>
+</div>
+
+<h3>Comandos para criar:</h3>
+
+<div class="terminal">
+<pre>CEDO DEFINE TCPIPSERVICE(HTTP8080) GROUP(GAPI) +
+    URM(DFHWBAAX) +
+    PORTNUMBER(08080) +
+    STATUS(OPEN) +
+    PROTOCOL(HTTP) +
+    TRANSACTION(CWXN) +
+    BACKLOG(00001) +
+    HOST(ANY) +
+    MAXDATALEN(000032)
+
+CEDA INSTALL TCPIPSERVICE(HTTP8080) GROUP(GAPI)</pre>
+</div>
+
+<hr>
+
+<h2 id="s1-urimap">1.2 URIMAP Server - O Roteador</h2>
+
+<p>A <code>URIMAP</code> com <code>USAGE(SERVER)</code> mapeia um PATH HTTP para um programa COBOL.</p>
+
+<div class="cics-view">
+<pre> CEDA  View Urimap( APISERVE )       
+ Urimap         : <span class="highlight">APISERVE</span>          
+ Group          : GAPI              
+ STatus         : Enabled           
+ USAge          : <span class="highlight">Server</span>            
+ SCheme         : HTTP              
+ HOST           : *                 
+ PAth           : <span class="highlight">/api/v1/cics/info</span> 
+ TRansaction    : SAPI              
+ PRogram        : APISERVE</pre>
+</div>
+
+<div class="alert-info">
+    <strong>🔑 Pontos Chave:</strong>
+    <ul>
+        <li><code>USAGE(SERVER)</code> - Define que o CICS vai <strong>responder</strong> requisições</li>
+        <li><code>PATH(/api/v1/cics/info)</code> - Rota que será exposta</li>
+        <li><code>TRANSACTION(SAPI)</code> - Transação que executa o programa</li>
+    </ul>
+</div>
+
+<h3>Comandos para criar:</h3>
+
+<div class="terminal">
+<pre>CEDA DEFINE URIMAP(APISERVE) GROUP(GAPI) +
+    USAGE(SERVER) +
+    SCHEME(HTTP) +
+    HOST(*) +
+    PATH(/api/v1/cics/info) +
+    TRANSACTION(SAPI) +
+    PROGRAM(APISERVE)
+
+CEDA INSTALL URIMAP(APISERVE) GROUP(GAPI)</pre>
+</div>
+
+<hr>
+
+<h2 id="s1-trans">1.3 Transação</h2>
+
+<p>A transação <code>SAPI</code> é acionada quando a URIMAP recebe uma requisição.</p>
+
+<div class="cics-view">
+<pre> CEDA  View TRANSaction( SAPI )     
+ TRANSaction    : <span class="highlight">SAPI</span>             
+ Group          : GAPI             
+ PROGram        : <span class="highlight">APISERVE</span></pre>
+</div>
+
+<h3>Comandos para criar:</h3>
+
+<div class="terminal">
+<pre>CEDA DEFINE TRANSACTION(SAPI) GROUP(GAPI) +
+    PROGRAM(APISERVE)
+
+CEDA INSTALL TRANSACTION(SAPI) GROUP(GAPI)</pre>
+</div>
+
+<hr>
+
+<h2 id="s1-prog">1.4 Programa COBOL - APISERVE</h2>
+
+<p>O programa que processa a requisição e retorna o JSON.</p>
+
+<div class="terminal">
+<pre>       IDENTIFICATION DIVISION.
+       PROGRAM-ID. APISERVE.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01 WS-RESPONSE-CODE     PIC S9(8) COMP.
+       01 WS-RESPONSE-CODE2    PIC S9(8) COMP.
+
+      * Dados recebidos
+       01 WS-REQUEST-DATA      PIC X(500).
+       01 WS-REQUEST-LEN       PIC S9(8) COMP.
+
+      * Dados de resposta
+       01 WS-RESPONSE-JSON     PIC X(500).
+       01 WS-RESPONSE-LEN      PIC S9(8) COMP.
+
+      * Headers HTTP
+       01 WS-MEDIA-TYPE        PIC X(50) 
+           VALUE 'application/json'.
+       01 WS-CHARSET           PIC X(12) VALUE 'UTF-8'.
+       01 WS-HTTP-STATUS       PIC S9(8) COMP VALUE 200.
+       01 WS-HTTP-STATUS-MSG   PIC X(20) VALUE 'OK'.
+
+      * Dados do CICS
+       01 WS-CICS-JOB          PIC X(8).
+       01 WS-CICS-USER         PIC X(8).
+       01 WS-CICS-TIME         PIC X(8).
+       01 WS-CICS-DATE         PIC X(8).
+
+      * Variáveis auxiliares
+       01 WS-TEMP-LEN          PIC S9(8) COMP.
+
+       PROCEDURE DIVISION.
+
+      * Obter informações do ambiente CICS
+           EXEC CICS ASSIGN
+               USERID(WS-CICS-USER)
+               APPLID(WS-CICS-JOB)
+               RESP(WS-RESPONSE-CODE)
+           END-EXEC
+
+           IF WS-RESPONSE-CODE NOT = DFHRESP(NORMAL)
+               MOVE 'CICSA02' TO WS-CICS-JOB
+               MOVE 'CICSUSR' TO WS-CICS-USER
+           END-IF
+
+           MOVE FUNCTION CURRENT-DATE(1:8) TO WS-CICS-DATE
+           MOVE FUNCTION CURRENT-DATE(9:6) TO WS-CICS-TIME
+
+      * Receber dados da requisição (se houver)
+           EXEC CICS WEB RECEIVE
+               INTO(WS-REQUEST-DATA)
+               MAXLENGTH(500)
+               LENGTH(WS-REQUEST-LEN)
+               RESP(WS-RESPONSE-CODE)
+           END-EXEC
+
+      * Montar JSON de resposta
+           MOVE SPACES TO WS-RESPONSE-JSON
+
+           STRING 
+               '{"status":"ok","message":"API CICS OK!",'
+               '"data":"'          WS-CICS-DATE '"'
+               ',"time":"'         WS-CICS-TIME(1:6) '"'
+               ',"cics_job":"'     WS-CICS-JOB  '"'
+               ',"cics_user":"'    WS-CICS-USER '"'
+               ',"timestamp":"2026-06-02T00:00:00Z"}'
+               DELIMITED BY SIZE 
+               INTO WS-RESPONSE-JSON
+           END-STRING
+
+      * Calcular tamanho real
+           MOVE 0 TO WS-RESPONSE-LEN
+           MOVE 500 TO WS-TEMP-LEN
+           PERFORM UNTIL WS-TEMP-LEN = 0
+               IF WS-RESPONSE-JSON(WS-TEMP-LEN:1) NOT = SPACE
+                   MOVE WS-TEMP-LEN TO WS-RESPONSE-LEN
+                   MOVE 0 TO WS-TEMP-LEN
+               ELSE
+                   SUBTRACT 1 FROM WS-TEMP-LEN
+               END-IF
+           END-PERFORM
+
+           IF WS-RESPONSE-LEN = 0
+               MOVE 160 TO WS-RESPONSE-LEN
+           END-IF
+
+      * Enviar resposta HTTP
+           EXEC CICS WEB SEND
+               FROM(WS-RESPONSE-JSON)
+               FROMLENGTH(WS-RESPONSE-LEN)
+               MEDIATYPE(WS-MEDIA-TYPE)
+               CHARACTERSET(WS-CHARSET)
+               STATUSCODE(WS-HTTP-STATUS)
+               STATUSTEXT(WS-HTTP-STATUS-MSG)
+               STATUSLEN(2)
+               RESP(WS-RESPONSE-CODE)
+               RESP2(WS-RESPONSE-CODE2)
+           END-EXEC
+
+           DISPLAY 'Resposta enviada: ' WS-RESPONSE-JSON(1:WS-RESPONSE-LEN)
+
+           EXEC CICS RETURN END-EXEC.</pre>
+</div>
+
+<div class="alert-success">
+    <strong>🎯 Segredo da Conversão EBCDIC→UTF-8:</strong> O parâmetro <code>CHARACTERSET(WS-CHARSET)</code> 
+    com valor <code>'UTF-8'</code> instrui o CICS a converter automaticamente os dados de EBCDIC para UTF-8.
+    Sem isso, o cliente receberia caracteres ilegíveis!
+</div>
+
+<hr>
+
+<h2 id="s1-test">1.5 Teste da API Server</h2>
+
+<h3>Verificar recursos instalados:</h3>
+
+<div class="cics-view">
+<pre>I TCP                                 
+ Tcp Ope Act(00003) Max( 65535 ) Cic  
+ 
+I URI                                        
+ Uri(<span class="highlight">APISERVE</span>) Ser Ena     Http                                              
+    Host(*                         ) Path(<span class="highlight">/api/v1/cics/info</span>               )  
+                                                                              
+I TRANS(SAPI)                                                 
+ Tra(<span class="highlight">SAPI</span>) Pri( 001 ) Pro(<span class="highlight">APISERVE</span>) Tcl( DFHTCL00 ) Ena Sta</pre>
+</div>
+
+<h3>Testar com curl do Windows:</h3>
+
+<div class="terminal-windows">
+<pre>C:\> curl "http://10.0.0.1:8080/api/v1/cics/info"
+
+{"status":"ok","message":"API CICS OK!","data":"20260602",
+"time":"143000","cics_job":"CICSA02 ","cics_user":"CICSUSER",
+"timestamp":"2026-06-02T00:00:00Z"}</pre>
+</div>
+
+<h3>Resposta esperada:</h3>
+
+<div class="terminal">
+<pre>HTTP/1.1 200 OK
+Server: IBM_CICS_Transaction_Server(zOS)
+Content-Type: application/json; charset=UTF-8
+
+{
+  "status": "ok",
+  "message": "API CICS OK!",
+  "data": "20260602",
+  "time": "143000",
+  "cics_job": "CICSA02",
+  "cics_user": "CICSUSER",
+  "timestamp": "2026-06-02T00:00:00Z"
+}</pre>
+</div>
+
+<hr>
+
+<h1 id="client">🔵 Parte 2: Consumindo uma API REST</h1>
+
+<blockquote>
+    <strong>🎯 Objetivo:</strong> Consumir a API pública <code>api.open-notify.org/iss-now.json</code> 
+    que retorna a posição atual da Estação Espacial Internacional (ISS).
+</blockquote>
+
+<h2 id="c1-urimap">2.1 URIMAP Client - Conexão com API Externa</h2>
+
+<p>A <code>URIMAP</code> com <code>USAGE(CLIENT)</code> define como o CICS se conecta a uma API externa.</p>
+
+<div class="cics-view">
+<pre> CEDA  View Urimap( URIGET   )        
+ Urimap         : <span class="highlight">URIGET</span>             
+ Group          : GAPI               
+ STatus         : Enabled            
+ USAge          : <span class="highlight">Client</span>             
+ SCheme         : <span class="highlight">HTTP</span>               
+ POrt           : 00080              
+ HOST           : <span class="highlight">api.open-notify.org</span>
+ PAth           : <span class="highlight">/iss-now.json</span>      
+                :                    </pre>
+</div>
+
+<div class="alert-info">
+    <strong>🔑 Pontos Chave:</strong>
+    <ul>
+        <li><code>USAGE(CLIENT)</code> - Define que o CICS vai <strong>consumir</strong> a API</li>
+        <li><code>SCHEME(HTTP)</code> - Usa HTTP (sem TLS/SSL)</li>
+        <li><code>HOST(api.open-notify.org)</code> - Nome do host da API</li>
+        <li><code>PORT(00080)</code> - Porta 80 (HTTP padrão)</li>
+    </ul>
+</div>
+
+<h3>Comandos para criar:</h3>
+
+<div class="terminal">
+<pre>CEDA DEFINE URIMAP(URIGET) GROUP(GAPI) +
+    USAGE(CLIENT) +
+    SCHEME(HTTP) +
+    HOST(api.open-notify.org) +
+    PORT(00080) +
+    PATH(/iss-now.json)
+
+CEDA INSTALL URIMAP(URIGET) GROUP(GAPI)</pre>
+</div>
+
+<hr>
+
+<h2 id="c1-trans">2.2 Transação</h2>
+
+<p>A transação <code>ISSG</code> executa o programa que faz a chamada à API externa.</p>
+
+<div class="cics-view">
+<pre> CEDA  View TRANSaction( ISSG )       
+ TRANSaction    : <span class="highlight">ISSG</span>               
+ Group          : GAPI               
+ PROGram        : <span class="highlight">TESTGET</span></pre>
+</div>
+
+<h3>Comandos para criar:</h3>
+
+<div class="terminal">
+<pre>CEDA DEFINE TRANSACTION(ISSG) GROUP(GAPI) +
+    PROGRAM(TESTGET)
+
+CEDA INSTALL TRANSACTION(ISSG) GROUP(GAPI)</pre>
+</div>
+
+<hr>
+
+<h2 id="c1-prog">2.3 Programa COBOL - TESTGET</h2>
+
+<p>O programa que consome a API externa via GET e exibe a resposta.</p>
+
+<div class="terminal">
+<pre>       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TESTGET.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01 WS-RESPONSE-CODE     PIC S9(8) COMP.
+       01 WS-RESPONSE-CODE2    PIC S9(8) COMP.
+       01 WS-TOKEN             PIC X(8).
+
+      * Dados da resposta
+       01 WS-JSON-RESPONSE     PIC X(2000).
+       01 WS-RESP-LEN          PIC S9(8) COMP.
+
+      * HTTP Status
+       01 WS-HTTP-STATUS       PIC S9(8) COMP.
+       01 WS-HTTP-STATTEXT     PIC X(100).
+       01 WS-STATTEXT-LEN      PIC S9(8) COMP VALUE 100.
+
+       PROCEDURE DIVISION.
+
+           DISPLAY 'Consultando ISS Location...'
+
+      * 1. Abrir conexao HTTP
+           EXEC CICS WEB OPEN
+               URIMAP('URIGET')
+               SESSTOKEN(WS-TOKEN)
+               RESP(WS-RESPONSE-CODE)
+               RESP2(WS-RESPONSE-CODE2)
+           END-EXEC
+
+           IF WS-RESPONSE-CODE NOT = DFHRESP(NORMAL)
+               DISPLAY 'Erro WEB OPEN'
+               DISPLAY 'RESP : ' WS-RESPONSE-CODE
+               DISPLAY 'RESP2: ' WS-RESPONSE-CODE2
+               EXEC CICS RETURN END-EXEC
+           END-IF
+
+           DISPLAY 'WEB OPEN OK - Token: ' WS-TOKEN
+
+      * 2. Enviar GET e receber resposta
+           EXEC CICS WEB CONVERSE
+               SESSTOKEN(WS-TOKEN)
+               METHOD(DFHVALUE(GET))
+               INTO(WS-JSON-RESPONSE)
+               MAXLENGTH(2000)
+               TOLENGTH(WS-RESP-LEN)
+               STATUSCODE(WS-HTTP-STATUS)
+               STATUSTEXT(WS-HTTP-STATTEXT)
+               STATUSLEN(WS-STATTEXT-LEN)
+               RESP(WS-RESPONSE-CODE)
+               RESP2(WS-RESPONSE-CODE2)
+           END-EXEC
+
+           DISPLAY '============================================'
+           DISPLAY 'RESULTADO:'
+           DISPLAY 'CICS RESP : ' WS-RESPONSE-CODE
+           DISPLAY 'CICS RESP2: ' WS-RESPONSE-CODE2
+           DISPLAY 'HTTP STATUS: ' WS-HTTP-STATUS
+           DISPLAY 'RESP DADOS : ' 
+               WS-JSON-RESPONSE(1:WS-RESP-LEN)
+           DISPLAY '============================================'
+
+      * 3. Fechar conexao
+           EXEC CICS WEB CLOSE
+               SESSTOKEN(WS-TOKEN)
+               RESP(WS-RESPONSE-CODE2)
+           END-EXEC
+
+           DISPLAY 'Programa finalizado.'
+           EXEC CICS RETURN END-EXEC.</pre>
+</div>
+
+<hr>
+
+<h2 id="c1-test">2.4 Teste da API Client</h2>
+
+<h3>Verificar recursos instalados:</h3>
+
+<div class="cics-view">
+<pre>I URI                                                                      
+ Uri(<span class="highlight">URIGET</span>  ) Cli Ena     Http                   Por(00080)               
+    Host(<span class="highlight">api.open-notify.org</span>:80    ) Path(<span class="highlight">/iss-now.json</span>                   )				
+I TRANS(ISSG)                                                
+ Tra(<span class="highlight">ISSG</span>) Pri( 001 ) Pro(<span class="highlight">TESTGET</span> ) Tcl( DFHTCL00 ) Ena Sta</pre>
+</div>
+
+<h3>Executar a transação:</h3>
+
+<div class="terminal">
+<pre>F CICSA02,TRANS(ISSG)</pre>
+</div>
+
+<h3>Log esperado no CICS:</h3>
+
+<div class="terminal">
+<pre>Consultando ISS Location...
+WEB OPEN OK - Token: 0A1B2C3D
+============================================
+RESULTADO:
+CICS RESP : 00000000
+CICS RESP2: 00000000
+HTTP STATUS: 00000200
+RESP DADOS : {"timestamp":1748926800,
+"iss_position":{"latitude":"-33.8688",
+"longitude":"151.2093"},"message":"success"}
+============================================
+Programa finalizado.</pre>
+</div>
+
+<h3>Resposta da API (formato JSON):</h3>
+
+<div class="terminal">
+<pre>{
+  "timestamp": 1748926800,
+  "iss_position": {
+    "latitude": "-33.8688",
+    "longitude": "151.2093"
+  },
+  "message": "success"
+}</pre>
+</div>
+
+<hr>
+
+<h2 id="conclusao">🎯 Conclusão</h2>
+
+<p>
+Neste guia, demonstramos como o <strong>CICS TS</strong> pode atuar tanto como 
+<strong>servidor</strong> quanto como <strong>cliente</strong> de APIs REST:
+</p>
+
+<table>
+    <tr><th>Funcionalidade</th><th>Recursos Utilizados</th><th>Status</th></tr>
+    <tr>
+        <td>🟣 Servir API</td>
+        <td>TCPIPSERVICE + URIMAP(SERVER) + TRANSACTION + COBOL</td>
+        <td class="success">✅ Funcionando</td>
+    </tr>
+    <tr>
+        <td>🔵 Consumir API HTTP</td>
+        <td>URIMAP(CLIENT) + TRANSACTION + COBOL</td>
+        <td class="success">✅ Funcionando</td>
+    </tr>
+</table>
+<br>
+<h2 id="praticas">Práticas de Mercado</h2>
+
+<p>
+ O CICS TS possui suporte nativo a HTTP, permitindo criar e consumir 
+    APIs REST com COBOL. Para APIs HTTPS, é necessário um proxy como Flask, nginx, IBM Integration Bus (IIB) ou IBM z/OS Connect que faça a 
+    ponte entre o HTTP do CICS e o HTTPS da internet. Esta arquitetura é o padrão de modernização 
+    de mainframes no mercado.
+</p><br>
+<p>Abaixo uma tabela comparativa das ferramentas.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Solução</th>
+            <th>Tipo</th>
+            <th>Complexidade</th>
+            <th>Custo</th>
+            <th>Ideal para</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>IBM z/OS Connect</strong></td>
+            <td>Específico para CICS</td>
+            <td>Média</td>
+            <td>$$$ (IBM)</td>
+            <td>Mainframe puro</td>
+        </tr>
+        <tr>
+            <td><strong>IBM Integration Bus (IIB)</strong></td>
+            <td>ESB completo</td>
+            <td>Alta</td>
+            <td>$$$$ (IBM)</td>
+            <td>Integração corporativa</td>
+        </tr>
+        <tr>
+            <td><strong>Flask (seu proxy)</strong></td>
+            <td>API Gateway leve</td>
+            <td>Baixa</td>
+            <td>Grátis</td>
+            <td>Estudos/labs</td>
+        </tr>
+        <tr>
+            <td><strong>nginx / HAProxy</strong></td>
+            <td>Proxy reverso</td>
+            <td>Baixa</td>
+            <td>Grátis</td>
+            <td>Produção</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<div class="badges-container">
+    <img src="https://img.shields.io/badge/Mainframe-Z%2FOS-blue?style=for-the-badge&logo=ibm" alt="Mainframe">
+    <img src="https://img.shields.io/badge/COBOL-CICS-green?style=for-the-badge" alt="COBOL CICS">
+    <img src="https://img.shields.io/badge/REST-API-purple?style=for-the-badge" alt="REST API">
+    <img src="https://img.shields.io/badge/HTTP-JSON-orange?style=for-the-badge" alt="HTTP JSON">
+    <img src="https://img.shields.io/badge/ISS-Space-lightgrey?style=for-the-badge" alt="ISS">
+</div>
+<footer class="site-disclaimer-footer">
+    <hr class="disclaimer-divider">
+    <p>Este projeto possui fins estritamente educacionais. Consulte o nosso 
+       <a href="/CICS/disclaimer.html" class="disclaimer-link">Aviso Legal / Disclaimer</a>.
+    </p>
+</footer>
+<p style="text-align: center; margin-top: 2rem;">
+    <a href="#">🔝 Voltar ao topo</a>
+</p>
+
+
+</body>
+</html>
